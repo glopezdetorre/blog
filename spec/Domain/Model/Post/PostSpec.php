@@ -128,4 +128,18 @@ class PostSpec extends ObjectBehavior
             $this->shouldThrow(\InvalidArgumentException::class)->during('changeSlug', [$badSlug]);
         }
     }
+
+    function it_should_not_be_published_by_default()
+    {
+        $this->published()->shouldBe(false);
+    }
+
+    function it_sould_allow_changing_publishing_status()
+    {
+        $this->published()->shouldBe(false);
+        $this->publish();
+        $this->published()->shouldBe(true);
+        $this->unpublish();
+        $this->published()->shouldBe(false);
+    }
 }
