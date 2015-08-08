@@ -1,0 +1,9 @@
+# IntelliJ
+.idea
+*.iml
+
+# OS X
+.DS_Store
+
+# Composer
+vendor/

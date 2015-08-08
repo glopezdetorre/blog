@@ -1,0 +1,24 @@
+{
+    "name": "gorka/blog",
+    "description": "Blog",
+    "authors": [
+        {
+            "name": "Gorka López de Torre",
+            "email": "glopezdetorre@gmail.com"
+        }
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Gorka\\Blog\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^2.2"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "beberlei/assert": "^2.3",
+        "ramsey/uuid": "^2.8"
+    }
+}

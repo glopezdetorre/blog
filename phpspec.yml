@@ -1,0 +1,4 @@
+suites:
+    tickt_suite:
+        namespace: Gorka\Blog
+        psr4_prefix: Gorka\Blog
