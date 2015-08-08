@@ -30,6 +30,9 @@ class Post
     /** @var PostId */
     private $id;
 
+    /** @var  boolean */
+    private $published;
+
     /**
      * @param PostId $id
      * @param $title
@@ -40,6 +43,7 @@ class Post
         $this->id = $id;
         $this->setTitle($title);
         $this->creationDateTime = $creationDateTime;
+        $this->setPublished(false);
     }
 
     public function title()
@@ -105,5 +109,25 @@ class Post
     public function id()
     {
         return $this->id;
+    }
+
+    public function publish()
+    {
+        $this->setPublished(true);
+    }
+
+    public function published()
+    {
+        return $this->published;
+    }
+
+    public function unpublish()
+    {
+        $this->setPublished(false);
+    }
+
+    private function setPublished($status)
+    {
+        $this->published = $status;
     }
 }
