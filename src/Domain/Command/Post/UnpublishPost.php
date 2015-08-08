@@ -2,9 +2,10 @@
 
 namespace Gorka\Blog\Domain\Command\Post;
 
+use Gorka\Blog\Domain\Command\DomainCommand;
 use Gorka\Blog\Domain\Model\Post\PostId;
 
-class UnpublishPost
+class UnpublishPost implements DomainCommand
 {
     /**
      * @var PostId
