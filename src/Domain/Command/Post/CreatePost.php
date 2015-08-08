@@ -2,7 +2,9 @@
 
 namespace Gorka\Blog\Domain\Command\Post;
 
-class CreatePost
+use Gorka\Blog\Domain\Command\DomainCommand;
+
+class CreatePost implements DomainCommand
 {
 
     /** @var  string */

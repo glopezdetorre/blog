@@ -2,9 +2,10 @@
 
 namespace Gorka\Blog\Domain\Event\Post;
 
+use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Model\Post\PostId;
 
-class PostWasUnpublished
+class PostWasUnpublished implements DomainEvent
 {
 
     /**
