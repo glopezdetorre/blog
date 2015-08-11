@@ -18,7 +18,7 @@ class PostWasRead implements DomainEvent
         $this->postId = $postId;
     }
 
-    public function postId()
+    public function aggregateId()
     {
         return $this->postId;
     }

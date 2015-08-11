@@ -21,8 +21,8 @@ class PostWasPublishedSpec extends ObjectBehavior
         $this->shouldHaveType(PostWasPublished::class);
     }
 
-    function it_should_allow_getting_post_id_to_publish()
+    function it_should_allow_getting_post_id()
     {
-        $this->postId()->shouldBeLike(self::POST_ID);
+        $this->aggregateId()->shouldBeLike(self::POST_ID);
     }
 }

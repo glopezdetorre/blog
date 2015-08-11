@@ -9,8 +9,8 @@ use Prophecy\Argument;
 
 class PostSpec extends ObjectBehavior
 {
-    const CREATION_DATE_STRING = '2015-02-15 23:00:00';
-    const TITLE = 'Title';
+    const TEST_CONTENT = 'My content';
+    const TEST_TITLE = 'My title';
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
 
     /** @var \DateTimeImmutable */
@@ -18,15 +18,12 @@ class PostSpec extends ObjectBehavior
 
     function let()
     {
-        $this->testDate = \DateTimeImmutable::createFromFormat(
-            'Y-m-d H:i:s',
-            self::CREATION_DATE_STRING
-        );
-
-        $this->beConstructedWith(
-            PostId::create(self::POST_ID),
-            self::TITLE,
-            $this->testDate
+        $this->beConstructedThrough(
+            'create', [
+                PostId::create(self::POST_ID),
+                self::TEST_TITLE,
+                self::TEST_CONTENT
+            ]
         );
     }
 
@@ -40,14 +37,11 @@ class PostSpec extends ObjectBehavior
         $this->id()->shouldBeLike(PostId::create(self::POST_ID));
     }
 
-    function it_should_have_a_title()
+    function it_should_record_title_changes()
     {
-        $this->title()->shouldBe(self::TITLE);
-    }
+        $this->changeTitle('New title');
+        $events = $this->recordedEvents();
 
-    function it_should_have_a_creation_date()
-    {
-        $this->creationDateTime()->shouldBeLike($this->testDate);
     }
 
     function it_should_not_allow_non_string_titles()
@@ -62,7 +56,7 @@ class PostSpec extends ObjectBehavior
         foreach ($badTitles as $badTitle) {
             $this
                 ->shouldThrow(\InvalidArgumentException::class)
-                ->during('__construct', [PostId::create(self::POST_ID), $badTitle, $this->testDate]);
+                ->during('create', [PostId::create(self::POST_ID), $badTitle, self::TEST_CONTENT]);
         }
     }
 
@@ -79,7 +73,7 @@ class PostSpec extends ObjectBehavior
         foreach ($emptyTitles as $emptyTitle) {
             $this
                 ->shouldThrow(\InvalidArgumentException::class)
-                ->during('__construct', [PostId::create(self::POST_ID), $emptyTitle, $this->testDate]);
+                ->during('create', [PostId::create(self::POST_ID), $emptyTitle, self::TEST_CONTENT]);
         }
     }
 
@@ -87,7 +81,7 @@ class PostSpec extends ObjectBehavior
     {
         $content = "Test content";
         $this->changeContent($content);
-        $this->content()->shouldBe($content);
+        $events = $this->recordedEvents();
     }
 
     function it_should_not_allow_non_stringable_content()
@@ -108,7 +102,7 @@ class PostSpec extends ObjectBehavior
     {
         $slug = "new-slug-post";
         $this->changeSlug($slug);
-        $this->slug()->shouldBe($slug);
+        $events = $this->recordedEvents();
     }
 
     function it_should_not_allow_non_string_or_empty_slugs()
@@ -129,17 +123,11 @@ class PostSpec extends ObjectBehavior
         }
     }
 
-    function it_should_not_be_published_by_default()
-    {
-        $this->published()->shouldBe(false);
-    }
-
     function it_sould_allow_changing_publishing_status()
     {
-        $this->published()->shouldBe(false);
         $this->publish();
-        $this->published()->shouldBe(true);
+        $events = $this->recordedEvents();
         $this->unpublish();
-        $this->published()->shouldBe(false);
+        $events = $this->recordedEvents();
     }
 }
