@@ -109,7 +109,7 @@ class Post implements EventRecording
 
     private function apply(DomainEvent $event)
     {
-        $methodName = 'apply'.get_class($event);
+        $methodName = 'apply'.(new \ReflectionClass($event))->getShortName();
         if (method_exists($this, $methodName)) {
             $this->$methodName($event);
         }

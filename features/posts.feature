@@ -95,7 +95,7 @@ Feature: Posts
 
   Scenario Outline: Publishing an already published post
     Given A post with id <id> exists with title <title> and content <content>
-      And Post is published
+      And Post with id <id> is published
     When I call publish
     Then No new events should have been recorded
 
@@ -105,7 +105,7 @@ Feature: Posts
 
   Scenario Outline: Unpublishing a post
     Given A post with id <id> exists with title <title> and content <content>
-      And Post is published
+      And Post with id <id> is published
     When I call unpublish
     Then I should see a PostWasUnpublished event with id <id>
 
@@ -115,10 +115,10 @@ Feature: Posts
 
   Scenario Outline: Unpublishing an unpublished post
     Given A post with id <id> exists with title <title> and content <content>
+      And Post with id <id> is unpublished
     When I call unpublish
     Then No new events should have been recorded
 
     Examples:
       | id                                      | title    | content       |
       | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "Title"  | "My content"  |
-

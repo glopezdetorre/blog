@@ -2,6 +2,7 @@
 
 namespace spec\Gorka\Blog\Domain\Model\Post;
 
+use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
@@ -12,9 +13,6 @@ class PostSpec extends ObjectBehavior
     const TEST_CONTENT = 'My content';
     const TEST_TITLE = 'My title';
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
-
-    /** @var \DateTimeImmutable */
-    private $testDate;
 
     function let()
     {
@@ -39,8 +37,6 @@ class PostSpec extends ObjectBehavior
 
     function it_should_record_title_changes()
     {
-        $this->changeTitle('New title');
-        $events = $this->recordedEvents();
 
     }
 
@@ -79,9 +75,7 @@ class PostSpec extends ObjectBehavior
 
     function it_should_allow_changing_its_content()
     {
-        $content = "Test content";
-        $this->changeContent($content);
-        $events = $this->recordedEvents();
+
     }
 
     function it_should_not_allow_non_stringable_content()
@@ -100,9 +94,7 @@ class PostSpec extends ObjectBehavior
 
     function it_should_allow_chaging_its_slug()
     {
-        $slug = "new-slug-post";
-        $this->changeSlug($slug);
-        $events = $this->recordedEvents();
+
     }
 
     function it_should_not_allow_non_string_or_empty_slugs()
@@ -125,9 +117,6 @@ class PostSpec extends ObjectBehavior
 
     function it_sould_allow_changing_publishing_status()
     {
-        $this->publish();
-        $events = $this->recordedEvents();
-        $this->unpublish();
-        $events = $this->recordedEvents();
+
     }
 }

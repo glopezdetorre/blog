@@ -3,8 +3,6 @@
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Gherkin\Node\PyStringNode;
-use Behat\Gherkin\Node\TableNode;
 use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
@@ -32,9 +30,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     private $exception;
 
     /**
-     * @var DomainEvent[]
+     * @var EventHistory
      */
-    private $eventsInGivenStep;
+    private $eventHistory;
 
     /**
      * Initializes context.
@@ -45,12 +43,29 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function __construct()
     {
+        $this->eventHistory = new EventHistory();
+    }
+
+    /**
+     * @param DomainEvent[] $events
+     * @param string $eventType
+     * @return DomainEvent[]
+     */
+    private function filterByEventType($events, $eventType) {
+        $filteredEvents = array_filter(
+            $events,
+            function($event) use ($eventType) {
+                return ($event instanceof $eventType);
+            }
+        );
+        return $filteredEvents;
     }
 
     /**
      * @Given No post exists with id :id
      */
-    public function NoPostExistsWithId($id) {
+    public function NoPostExistsWithId($id)
+    {
 
     }
 
@@ -71,27 +86,15 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwascreatedEventWithIdTitleAndContent($id, $title, $content)
     {
-        $events = $this->post->recordedEvents()->events();
-        if (count($events) !== 1) {
-            throw new Exception("Expected 1 event, but I saw ".count($events).".");
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents()->events():[], PostWasCreated::class);
+        foreach ($events as $event) {
+            if ($event->aggregateId() == $id && $event->postTitle() == $title && $event->postContent() == $content) {
+                return;
+            }
         }
-
-        $event = $events[0];
-        if (!($event instanceof PostWasCreated)) {
-            throw new Exception("Expected PostWasCreated event, but I saw ".get_class($event).".");
-        }
-
-        if ($event->aggregateId() != $id) {
-            throw new Exception("Expected id '$id', but I saw '{$event->aggregateId()}'");
-        }
-
-        if ($event->postTitle() != $title) {
-            throw new Exception("Expected title '$title', but I saw '{$event->postTitle()}'");
-        }
-
-        if ($event->postContent() != $content) {
-            throw new Exception("Expected content '$content', but I saw '{$event->postContent()}'");
-        }
+        throw new Exception(
+            "Expected PostWasCreated event with id '$id', title '$title' and content '$content' not found'"
+        );
     }
 
     /**
@@ -99,17 +102,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function APostWithIdExistsWithTitleAndContent($id, $title, $content)
     {
-        $history = new EventHistory();
-        $history->add(new PostWasCreated(PostId::create($id), $title, $content));
-
-        $this->post = Post::reconstituteFromEvents(
-            new AggregateHistory(
-                PostId::create($id),
-                $history
-            )
-        );
-
-        $this->eventsInGivenStep = $this->post->recordedEvents();
+        $postId = PostId::create($id);
+        $this->eventHistory->add(new PostWasCreated($postId, $title, $content));
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->eventHistory));
     }
 
     /**
@@ -125,21 +120,17 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Then I should see a PostTitleWasChanged event with id :id and title :title
+     * @Then I should see a PostTitleWasChanged event with id :id and title :newTitle
      */
-    public function IShouldSeeAPosttitlewaschangedEventWithIdAndTitle($id, $title)
+    public function IShouldSeeAPosttitlewaschangedEventWithIdAndTitle($id, $newTitle)
     {
-        $events = $this->post->recordedEvents()->events();
+        $events = $this->filterByEventType($this->post->recordedEvents()->events(), PostTitleWasChanged::class);
         foreach ($events as $event) {
-            if (!($event instanceof PostTitleWasChanged)) {
-                continue;
-            } elseif ($event->aggregateId() != $id || $event->postTitle() !== $title) {
-                continue;
-            } else {
+            if ($event->aggregateId() == $id && $event->postTitle() == $newTitle) {
                 return;
             }
         }
-        throw new \Exception("Expected PostTitleWasChanged event with id '{$id}' and title '{$title}' was not found");
+        throw new \Exception("Expected PostTitleWasChanged event with id '{$id}' and title '{$newTitle}' was not found");
     }
 
     /**
@@ -149,7 +140,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         return str_replace(['\n', '\t'], ["\n", "\t"], $arg);
     }
-
 
     /**
      * @Transform /^null$/i
@@ -176,15 +166,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostcontentwaschangedEventWithIdAndContent($id, $content)
     {
-        $events = $this->post->recordedEvents()->events();
+        $events = $this->filterByEventType($this->post->recordedEvents()->events(), PostContentWasChanged::class);
         foreach ($events as $event) {
-            if (!($event instanceof PostContentWasChanged)) {
-                continue;
-            } elseif ($event->aggregateId() != $id || $event->postContent() !== $content) {
-                continue;
-            } else {
-                return;
-            }
+            if ($event->aggregateId() == $id) return;
         }
         throw new \Exception("Expected PostContentWasChanged event with id '{$id}' and title '{$content}' was not found");
     }
@@ -204,12 +188,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function noNewEventsShouldHaveBeenRecorded()
     {
-        $events = [];
-        if ($this->post !== null) {
-            $events = $this->post->recordedEvents();
-        }
-
-        if ((count($events) - count($this->eventsInGivenStep)) > 0) {
+        $events = $this->post?$this->post->recordedEvents()->events():[];
+        if (count($events) > 0) {
             throw new \Exception("No events should have been recorded, ".count($events)." found");
         }
     }
@@ -231,26 +211,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwaspublishedEventWithId($id)
     {
-        $events = $this->post->recordedEvents()->events();
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents()->events():[], PostWasPublished::class);
         foreach ($events as $event) {
-            if (!($event instanceof PostWasPublished)) {
-                continue;
-            } elseif ($event->aggregateId() != $id) {
-                continue;
-            } else {
+            if ($event->aggregateId() == $id) {
                 return;
             }
         }
         throw new \Exception("Expected PostWasPublished event with id '{$id}' was not found");
-    }
-
-    /**
-     * @Given Post is published
-     */
-    public function postIsPublished()
-    {
-        $this->post->publish();
-        $this->eventsInGivenStep = $this->post->recordedEvents();
     }
 
     /**
@@ -270,16 +237,30 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwasunpublishedEventWithId($id)
     {
-        $events = $this->post->recordedEvents()->events();
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents()->events():[], PostWasUnpublished::class);
         foreach ($events as $event) {
-            if (!($event instanceof PostWasUnpublished)) {
-                continue;
-            } elseif ($event->aggregateId() != $id) {
-                continue;
-            } else {
-                return;
-            }
+            if ($event->aggregateId() == $id) return;
         }
         throw new \Exception("Expected PostWasUnpublished event with id '{$id}' was not found");
+    }
+
+    /**
+     * @Given Post with id :id is published
+     */
+    public function postWithIdIsPublished($id)
+    {
+        $postId = PostId::create($id);
+        $this->eventHistory->add(new PostWasPublished($postId));
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->eventHistory));
+    }
+
+    /**
+     * @Given Post with id :id is unpublished
+     */
+    public function postWithIdIsUnpublished($id)
+    {
+        $postId = PostId::create($id);
+        $this->eventHistory->add(new PostWasUnpublished($postId));
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->eventHistory));
     }
 }
