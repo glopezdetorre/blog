@@ -4,22 +4,21 @@ namespace Gorka\Blog\Domain\Model;
 
 use Gorka\Blog\Domain\Event\DomainEvent;
 
-class AggregateHistory extends EventHistory
+class AggregateHistory
 {
     /**
      * @var AggregateId
      */
     private $id;
 
-    public function __construct(AggregateId $id, EventHistory $events = null) {
-        parent::__construct();
+    /**
+     * @var EventHistory
+     */
+    private $eventHistory;
 
+    public function __construct(AggregateId $id, $events = null) {
         $this->id = $id;
-        if ($events !== null) {
-            foreach ($events->events() as $event) {
-                $this->add($event);
-            }
-        }
+        $this->eventHistory = new EventHistory($events);
     }
 
     public function aggregateId()
@@ -31,6 +30,11 @@ class AggregateHistory extends EventHistory
         if ($event->aggregateId() != $this->id) {
             throw new \InvalidArgumentException('Event does not belong to this entity');
         }
-        parent::add($event);
+        $this->eventHistory->add($event);
+    }
+
+    public function events()
+    {
+        return $this->eventHistory->events();
     }
 }

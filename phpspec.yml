@@ -2,3 +2,10 @@ suites:
     tickt_suite:
         namespace: Gorka\Blog
         psr4_prefix: Gorka\Blog
+
+extensions:
+    - PhpSpec\Extension\CodeCoverageExtension
+
+code_coverage:
+    output: build/coverage
+    format: html

@@ -5,12 +5,12 @@ namespace Gorka\Blog\Domain\Model\Post;
 use Assert\Assertion;
 use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
-use Gorka\Blog\Domain\Event\Post\PostSlugWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
 use Gorka\Blog\Domain\Model\AggregateHistory;
+use Gorka\Blog\Domain\Model\EventHistory;
 use Gorka\Blog\Domain\Model\EventRecording;
 
 class Post implements EventRecording
@@ -18,7 +18,7 @@ class Post implements EventRecording
     /** @var PostId */
     private $id;
 
-    /** @var AggregateHistory */
+    /** @var EventHistory */
     private $events;
 
     /** @var bool */
@@ -58,12 +58,6 @@ class Post implements EventRecording
     {
         $this->guardContent($content);
         $this->recordThat(new PostContentWasChanged($this->id, $content));
-    }
-
-    public function changeSlug($slug)
-    {
-        $this->guardSlug($slug);
-        $this->recordThat(new PostSlugWasChanged($this->id, $slug));
     }
 
     public function publish()
@@ -141,14 +135,5 @@ class Post implements EventRecording
     {
         Assertion::string($content, 'Content should be a string');
         Assertion::notBlank(trim($content), 'Content cannot be blank');
-    }
-
-    /**
-     * @param $slug
-     */
-    private function guardSlug($slug)
-    {
-        Assertion::string($slug, 'Slug should be a string');
-        Assertion::notBlank(trim($slug), 'Slug cannot be blank');
     }
 }
