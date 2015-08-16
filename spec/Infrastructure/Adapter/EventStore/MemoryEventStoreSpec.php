@@ -9,6 +9,21 @@ use Gorka\Blog\Infrastructure\Adapter\EventStore\MemoryEventStore;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @todo: this shouldn't be necessary */
+class TestDomainEvent implements DomainEvent {
+
+    private $id;
+
+    public function __construct($id) {
+        $this->id = $id;
+    }
+
+    public function aggregateId()
+    {
+        return $this->id;
+    }
+}
+
 class MemoryEventStoreSpec extends ObjectBehavior
 {
     function it_is_initializable()
@@ -16,27 +31,22 @@ class MemoryEventStoreSpec extends ObjectBehavior
         $this->shouldHaveType(MemoryEventStore::class);
     }
 
-    function it_should_store_events(
-        AggregateId $id1,
-        AggregateId $id2,
-        AggregateHistory $history1,
-        AggregateHistory $history2,
-        DomainEvent $de1,
-        DomainEvent $de2,
-        DomainEvent $de3
-    ){
-        $de1->aggregateId()->willReturn($id1);
-        $de2->aggregateId()->willReturn($id1);
-        $de3->aggregateId()->willReturn($id2);
-        $history1->aggregateId()->willReturn($id1);
-        $history2->aggregateId()->willReturn($id2);
-        $history1->events()->willReturn([$de1, $de2]);
-        $history2->events()->willReturn([$de3]);
+    function it_should_store_events(){
+
+        $id1 = AggregateId::create('25769c6c-d34d-4bfe-ba98-e0ee856f3e7a');
+        $id2 = AggregateId::create('25769c6c-d34d-4bfe-ba98-e0ee856f3e7b');
+
+        $event1 = new TestDomainEvent($id1);
+        $event2 = new TestDomainEvent($id1);
+        $event3 = new TestDomainEvent($id2);
+
+        $history1 = new AggregateHistory($id1, [$event1, $event2]);
+        $history2 = new AggregateHistory($id2, [$event3]);
 
         $this->commit($history1);
         $this->commit($history2);
 
-        $this->aggregateHistory($id1)->events()->shouldBeLike([$de1, $de2]);
-        $this->aggregateHistory($id2)->events()->shouldBeLike([$de3]);
+        $this->aggregateHistory($id1)->shouldBe($history1);
+        $this->aggregateHistory($id2)->shouldBe($history2);
     }
 }
