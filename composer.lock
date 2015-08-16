@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dd0e9e524f7d706fc4b56a4750de8527",
+    "hash": "7ec44058b7210dd82df761f9ea6cb5d0",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -816,6 +816,277 @@
                 "tokenizer"
             ],
             "time": "2015-06-19 03:43:16"
+        },
+        {
+            "name": "rmiller/behat-spec",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/richardmiller/BehatSpec.git",
+                "reference": "9f36516185707d0bea384ff4285f5c36a6650442"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/richardmiller/BehatSpec/zipball/9f36516185707d0bea384ff4285f5c36a6650442",
+                "reference": "9f36516185707d0bea384ff4285f5c36a6650442",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "rmiller/error-extension": "~0.1",
+                "rmiller/exemplify-extension": "~0.2",
+                "rmiller/phpspec-extension": "~0.1",
+                "rmiller/phpspec-run-extension": "~0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RMiller\\BehatSpec\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Miller",
+                    "email": "mrrmiller46@gmail.com",
+                    "homepage": "http://richardmiller.co.uk"
+                }
+            ],
+            "description": "Behat and PhpSpec integration",
+            "homepage": "https://github.com/richardmiller/BehatSpec",
+            "keywords": [
+                "BDD",
+                "SpecBDD",
+                "StoryBDD"
+            ],
+            "time": "2014-11-12 14:09:59"
+        },
+        {
+            "name": "rmiller/caser",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/richardmiller/caser.git",
+                "reference": "ec7b0d9b5db806f5e6bcee48d6cce58efb20e834"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/richardmiller/caser/zipball/ec7b0d9b5db806f5e6bcee48d6cce58efb20e834",
+                "reference": "ec7b0d9b5db806f5e6bcee48d6cce58efb20e834",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpspec/phpspec": "~2.1@dev"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "RMiller\\Caser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Miller",
+                    "email": "mrrmiller46@gmail.com"
+                }
+            ],
+            "description": "Manipulates case",
+            "homepage": "https://github.com/richardmiller/caser",
+            "time": "2014-11-02 22:15:20"
+        },
+        {
+            "name": "rmiller/error-extension",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/richardmiller/ErrorExtension.git",
+                "reference": "26d27c7c67f99fd9d56f56147f85cbc991ca4834"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/richardmiller/ErrorExtension/zipball/26d27c7c67f99fd9d56f56147f85cbc991ca4834",
+                "reference": "26d27c7c67f99fd9d56f56147f85cbc991ca4834",
+                "shasum": ""
+            },
+            "require": {
+                "behat/behat": "~3.0,>=3.0.4",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "~2.1@dev"
+            },
+            "type": "behat-extension",
+            "autoload": {
+                "psr-4": {
+                    "RMiller\\ErrorExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Miller",
+                    "email": "mrrmiller46@gmail.com"
+                }
+            ],
+            "description": "Fatal error handling extension for Behat",
+            "homepage": "https://github.com/richardmiller/ErrorExtension",
+            "keywords": [
+                "BDD",
+                "Behat"
+            ],
+            "time": "2014-11-04 10:15:46"
+        },
+        {
+            "name": "rmiller/exemplify-extension",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/richardmiller/ExemplifyExtension.git",
+                "reference": "c08bff7c4628d8972d2f4aeb5d02f855fd4ab843"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/richardmiller/ExemplifyExtension/zipball/c08bff7c4628d8972d2f4aeb5d02f855fd4ab843",
+                "reference": "c08bff7c4628d8972d2f4aeb5d02f855fd4ab843",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "phpspec/phpspec": "~2.0",
+                "rmiller/caser": "~0.1"
+            },
+            "require-dev": {
+                "behat/behat": "~3.0",
+                "bossa/phpspec2-expect": "~1.0",
+                "phpspec/phpspec": "~2.1@dev"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RMiller\\ExemplifyExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Miller",
+                    "email": "mrrmiller46@gmail.com"
+                }
+            ],
+            "description": "PhpSpec extension that adds exemplify command to generate examples in specs ",
+            "homepage": "https://github.com/richardmiller/ExemplifyExtension",
+            "keywords": [
+                "BDD",
+                "phpspec"
+            ],
+            "time": "2014-11-12 13:59:10"
+        },
+        {
+            "name": "rmiller/phpspec-extension",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/richardmiller/PhpSpecExtension.git",
+                "reference": "df9967bd39cc20b7ab57475ccc93300c8d1ac6bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/richardmiller/PhpSpecExtension/zipball/df9967bd39cc20b7ab57475ccc93300c8d1ac6bb",
+                "reference": "df9967bd39cc20b7ab57475ccc93300c8d1ac6bb",
+                "shasum": ""
+            },
+            "require": {
+                "behat/behat": "~3.0,>=3.0.4",
+                "php": ">=5.4",
+                "phpspec/phpspec": "~2.0",
+                "symfony/process": "~2.1"
+            },
+            "require-dev": {
+                "rmiller/error-extension": "~0.1",
+                "rmiller/exemplify-extension": "~0.1"
+            },
+            "type": "behat-extension",
+            "autoload": {
+                "psr-4": {
+                    "RMiller\\PhpSpecExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Miller",
+                    "email": "mrrmiller46@gmail.com"
+                }
+            ],
+            "description": "PhpSpec extension for Behat",
+            "homepage": "https://github.com/richardmiller/PhpSpecExtension",
+            "keywords": [
+                "BDD",
+                "Behat",
+                "phpspec"
+            ],
+            "time": "2014-12-04 12:21:14"
+        },
+        {
+            "name": "rmiller/phpspec-run-extension",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/richardmiller/PhpSpecRunExtension.git",
+                "reference": "768400bcf73e5bf01e24146937cf241f994a2b59"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/richardmiller/PhpSpecRunExtension/zipball/768400bcf73e5bf01e24146937cf241f994a2b59",
+                "reference": "768400bcf73e5bf01e24146937cf241f994a2b59",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "phpspec/phpspec": "~2.0"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "~2.1@dev"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RMiller\\PhpSpecRunExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Miller",
+                    "email": "mrrmiller46@gmail.com"
+                }
+            ],
+            "description": "PhpSpec extension to execute the run command after the describe command",
+            "homepage": "https://github.com/richardmiller/PhpSpecRunExtension",
+            "keywords": [
+                "BDD",
+                "phpspec"
+            ],
+            "time": "2014-11-12 13:49:02"
         },
         {
             "name": "sebastian/comparator",

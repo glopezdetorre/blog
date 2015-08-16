@@ -1,11 +1,16 @@
 suites:
-    tickt_suite:
-        namespace: Gorka\Blog
-        psr4_prefix: Gorka\Blog
+  tickt_suite:
+    namespace: Gorka\Blog
+    psr4_prefix: Gorka\Blog
 
 extensions:
-    - PhpSpec\Extension\CodeCoverageExtension
+  # - PhpSpec\Extension\CodeCoverageExtension
+  - RMiller\BehatSpec\PhpSpecExtension
 
 code_coverage:
-    output: build/coverage
-    format: html
+  output: build/coverage
+  format: html
+
+rerunner:
+  path: vendor/bin/phpspec
+  commands: [describe, exemplify, your_own_fancy_command]
