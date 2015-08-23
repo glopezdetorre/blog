@@ -13,4 +13,4 @@ code_coverage:
 
 rerunner:
   path: vendor/bin/phpspec
-  commands: [describe, exemplify, your_own_fancy_command]
+  commands: [describe, exemplify]
