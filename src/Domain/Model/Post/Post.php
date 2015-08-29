@@ -3,107 +3,44 @@
 namespace Gorka\Blog\Domain\Model\Post;
 
 use Assert\Assertion;
+use Gorka\Blog\Domain\Event\DomainEvent;
+use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
+use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
+use Gorka\Blog\Domain\Event\Post\PostWasCreated;
+use Gorka\Blog\Domain\Event\Post\PostWasPublished;
+use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
+use Gorka\Blog\Domain\Model\AggregateHistory;
+use Gorka\Blog\Domain\Model\EventHistory;
+use Gorka\Blog\Domain\Model\EventRecording;
 
-class Post
+class Post implements EventRecording
 {
-
-    /**
-     * @var string
-     */
-    private $title;
-
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $creationDateTime;
-
-    /**
-     * @var string
-     */
-    private $content;
-
-    /**
-     * @var string
-     */
-    private $slug;
-
     /** @var PostId */
     private $id;
 
-    /** @var  boolean */
+    /** @var EventHistory */
+    private $events;
+
+    /** @var bool */
     private $published;
 
     /**
      * @param PostId $id
-     * @param $title
-     * @param \DateTimeImmutable $creationDateTime
      */
-    public function __construct(PostId $id, $title, \DateTimeImmutable $creationDateTime)
+    private function __construct(PostId $id)
     {
         $this->id = $id;
-        $this->setTitle($title);
-        $this->creationDateTime = $creationDateTime;
-        $this->setPublished(false);
+        $this->published = false;
+        $this->events = new AggregateHistory($id);
     }
 
-    public function title()
+    public static function create(PostId $id, $title, $content)
     {
-        return $this->title;
-    }
-
-    /**
-     * @param $title
-     * @return mixed
-     */
-    private function setTitle($title)
-    {
-        Assertion::string($title, 'Title should be a string');
-        Assertion::notBlank(trim($title), 'Title cannot be blank');
-        $this->title = $title;
-    }
-
-    public function creationDateTime()
-    {
-        return $this->creationDateTime;
-    }
-
-    public function changeContent($content)
-    {
-        $this->setContent($content);
-    }
-
-    public function content()
-    {
-        return $this->content;
-    }
-
-    /**
-     * @param $content
-     */
-    private function setContent($content)
-    {
-        Assertion::string($content, 'Content should be null or a string');
-        $this->content = $content;
-    }
-
-    public function changeSlug($slug)
-    {
-        $this->setSlug($slug);
-    }
-
-    public function slug()
-    {
-        return $this->slug;
-    }
-
-    /**
-     * @param $slug
-     */
-    private function setSlug($slug)
-    {
-        Assertion::string($slug, 'Slug should be a string');
-        Assertion::notBlank(trim($slug), 'Slug cannot be blank');
-        $this->slug = $slug;
+        $post = new static($id);
+        $post->guardTitle($title);
+        $post->guardContent($content);
+        $post->recordThat(new PostWasCreated($id, $title, $content));
+        return $post;
     }
 
     public function id()
@@ -111,23 +48,92 @@ class Post
         return $this->id;
     }
 
-    public function publish()
+    public function changeTitle($title)
     {
-        $this->setPublished(true);
+        $this->guardTitle($title);
+        $this->recordThat(new PostTitleWasChanged($this->id, $title));
     }
 
-    public function published()
+    public function changeContent($content)
     {
-        return $this->published;
+        $this->guardContent($content);
+        $this->recordThat(new PostContentWasChanged($this->id, $content));
+    }
+
+    public function publish()
+    {
+        if ($this->published) {
+            return;
+        }
+
+        $this->recordThat(new PostWasPublished($this->id));
     }
 
     public function unpublish()
     {
-        $this->setPublished(false);
+        if (!$this->published) {
+            return;
+        }
+
+        $this->recordThat(new PostWasUnpublished($this->id));
     }
 
-    private function setPublished($status)
+    public function recordedEvents()
     {
-        $this->published = $status;
+        return $this->events;
+    }
+
+    public function recordThat(DomainEvent $event)
+    {
+        $this->events->add($event);
+        $this->apply($event);
+    }
+
+    public static function reconstituteFromEvents(AggregateHistory $aggregateHistory)
+    {
+        $id = $aggregateHistory->aggregateId();
+        $postId = PostId::create($id->id());
+        $post = new Post($postId);
+
+        foreach ($aggregateHistory->events() as $event) {
+            $post->apply($event);
+        }
+        return $post;
+    }
+
+    private function apply(DomainEvent $event)
+    {
+        $methodName = 'apply'.(new \ReflectionClass($event))->getShortName();
+        if (method_exists($this, $methodName)) {
+            $this->$methodName($event);
+        }
+    }
+
+    private function applyPostWasPublished(DomainEvent $event)
+    {
+        $this->published = true;
+    }
+
+    private function applyPostWasUnpublished(DomainEvent $event)
+    {
+        $this->published = false;
+    }
+
+    /**
+     * @param $title
+     */
+    private function guardTitle($title)
+    {
+        Assertion::string($title, 'Title should be a string');
+        Assertion::notBlank(trim($title), 'Title cannot be blank');
+    }
+
+    /**
+     * @param $content
+     */
+    private function guardContent($content)
+    {
+        Assertion::string($content, 'Content should be a string');
+        Assertion::notBlank(trim($content), 'Content cannot be blank');
     }
 }
