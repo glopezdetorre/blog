@@ -5,9 +5,11 @@ namespace spec\Gorka\Blog\Domain\Model\Post;
 use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
+use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
 use Gorka\Blog\Domain\Model\AggregateHistory;
+use Gorka\Blog\Domain\Model\AggregateId;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\Exception\Example\FailureException;
@@ -139,6 +141,27 @@ class PostSpec extends ObjectBehavior
         $unexpectedEvent = new PostWasUnpublished(PostId::create(self::POST_ID));
         $this->unpublish();
         $this->recordedEvents()->shouldNotContainEvent($unexpectedEvent);
+    }
+
+    /**
+     * @todo: this test is tricky. Post does not store state, so we can only check
+     *  the proper id was set. We also check the only state we can: if the postWasPublished
+     *  event was applied properly, post should record the following postWasUnpublished event
+     */
+    function it_should_be_reconstitutable_from_events()
+    {
+        $id = PostId::create(self::POST_ID);
+        $aggregateHistory = new AggregateHistory(
+            $id,
+            [
+                new PostWasCreated($id, self::TEST_TITLE, self::TEST_CONTENT),
+                new PostWasPublished($id)
+            ]
+        );
+        $this->beConstructedThrough('reconstituteFromEvents', [$aggregateHistory]);
+        $this->id()->shouldBeLike($id);
+        $this->unpublish();
+        $this->recordedEvents()->shouldContainEvent(new PostWasUnpublished($id));
     }
 
     function getMatchers() {
