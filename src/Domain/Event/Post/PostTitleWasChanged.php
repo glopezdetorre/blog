@@ -21,7 +21,8 @@ class PostTitleWasChanged implements DomainEvent
     /**
      * @param PostId $id
      */
-    public function __construct(PostId $id, $postTitle) {
+    public function __construct(PostId $id, $postTitle)
+    {
         $this->id = $id;
         $this->postTitle = $postTitle;
     }

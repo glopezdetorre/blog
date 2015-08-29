@@ -7,7 +7,9 @@ use Gorka\Blog\Domain\Command\DomainCommand;
 class CreatePost implements DomainCommand
 {
 
-    /** @var  string */
+    /**
+ * @var  string
+*/
     private $postTitle;
 
     /**
@@ -15,7 +17,9 @@ class CreatePost implements DomainCommand
      */
     private $postCreationDateTime;
 
-    /** @var  string */
+    /**
+ * @var  string
+*/
     private $postContent;
 
     public function __construct($postTitle, \DateTimeImmutable $postCreationDateTime, $postContent)

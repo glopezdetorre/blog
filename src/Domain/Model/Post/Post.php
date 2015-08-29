@@ -15,13 +15,19 @@ use Gorka\Blog\Domain\Model\EventRecording;
 
 class Post implements EventRecording
 {
-    /** @var PostId */
+    /**
+ * @var PostId
+*/
     private $id;
 
-    /** @var EventHistory */
+    /**
+ * @var EventHistory
+*/
     private $events;
 
-    /** @var bool */
+    /**
+ * @var bool
+*/
     private $published;
 
     /**
