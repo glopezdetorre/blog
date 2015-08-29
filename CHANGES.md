@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/08/29
+
+- Initial CQRS/ES implementation
+
 ## 2015/08/08
 
 - Project started
