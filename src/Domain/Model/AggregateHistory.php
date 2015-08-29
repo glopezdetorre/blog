@@ -16,7 +16,8 @@ class AggregateHistory
      */
     private $eventHistory;
 
-    public function __construct(AggregateId $id, $events = null) {
+    public function __construct(AggregateId $id, $events = null)
+    {
         $this->id = $id;
         $this->eventHistory = new EventHistory($events);
     }
@@ -26,7 +27,8 @@ class AggregateHistory
         return $this->id;
     }
 
-    public function add(DomainEvent $event) {
+    public function add(DomainEvent $event)
+    {
         if ($event->aggregateId() != $this->id) {
             throw new \InvalidArgumentException('Event does not belong to this entity');
         }
