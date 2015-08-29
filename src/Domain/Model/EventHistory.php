@@ -49,6 +49,6 @@ class EventHistory implements \IteratorAggregate
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->events());
+        return new \ArrayIterator($this->events);
     }
 }
