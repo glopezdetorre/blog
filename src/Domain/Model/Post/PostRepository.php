@@ -2,28 +2,18 @@
 
 namespace Gorka\Blog\Domain\Model\Post;
 
+use Gorka\Blog\Domain\Model\AggregateHistory;
+
 interface PostRepository
 {
     /**
-     * @return PostId
+     * @param AggregateHistory $history
      */
-    public function nextIdentity();
+    public function commit(AggregateHistory $history);
 
     /**
      * @param PostId $id
-     * @return Post
+     * @return AggregateHistory
      */
-    public function byId(PostId $id);
-
-    /**
-     * @param Post $post
-     * @return mixed
-     */
-    public function add(Post $post);
-
-    /**
-     * @param string $slug
-     * @return Post
-     */
-    public function bySlug($slug);
+    public function history(PostId $id);
 }

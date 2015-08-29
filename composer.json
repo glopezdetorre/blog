@@ -14,7 +14,10 @@
         }
     },
     "require-dev": {
-        "phpspec/phpspec": "^2.2"
+        "phpspec/phpspec": "^2.2",
+        "behat/behat": "^3.0",
+        "henrikbjorn/phpspec-code-coverage": "^1.0",
+        "rmiller/behat-spec": "~0.2"
     },
     "minimum-stability": "stable",
     "require": {
