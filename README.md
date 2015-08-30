@@ -1,3 +1,3 @@
 # Blog
 
-Simple blog
+CQRS/EventSourcing example in PHP

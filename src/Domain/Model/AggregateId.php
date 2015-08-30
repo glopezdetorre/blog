@@ -9,7 +9,9 @@ use Rhumsaa\Uuid\Uuid;
 class AggregateId
 {
 
-    /** @var  Uuid */
+    /**
+ * @var  Uuid
+*/
     private $id;
 
     /**
