@@ -1,5 +1,10 @@
 # Changes
 
+## 2015/08/30
+
+- Update project description
+- Fixed coding style
+
 ## 2015/08/29
 
 - Initial CQRS/ES implementation
