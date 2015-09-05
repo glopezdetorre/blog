@@ -2,59 +2,18 @@
 
 namespace Gorka\Blog\Domain\Model;
 
-use Assert\Assertion;
-use Gorka\Blog\Domain\Model;
-use Rhumsaa\Uuid\Uuid;
-
-class AggregateId
+/**
+ * Interface AggregateId
+ */
+interface AggregateId
 {
-
     /**
- * @var  Uuid
-*/
-    private $id;
-
-    /**
-     * @param $id
+     * @return mixed
      */
-    protected function __construct($id)
-    {
-        $this->setId($id);
-    }
-
-    public static function create($id)
-    {
-        return new static($id);
-    }
+    public function id();
 
     /**
-     * @return Uuid
+     * @return string
      */
-    public function id()
-    {
-        return $this->id;
-    }
-
-    public function __toString()
-    {
-        return $this->id()->toString();
-    }
-
-    /**
-     * @param $id
-     */
-    private function setId($id)
-    {
-        if (!($id instanceof Uuid)) {
-            try {
-                Assertion::string($id, 'ID should be a string');
-                Assertion::notBlank(trim($id), 'ID cannot be blank');
-                Assertion::true(Uuid::isValid($id), 'ID should be a valid UUID');
-                $id = Uuid::fromString($id);
-            } catch (\Exception $e) {
-                throw new \InvalidArgumentException($e->getMessage());
-            }
-        }
-        $this->id = $id;
-    }
+    public function __toString();
 }

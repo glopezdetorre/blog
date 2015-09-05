@@ -2,16 +2,28 @@
 
 namespace spec\Gorka\Blog\Domain\Model\Post;
 
+use Gorka\Blog\Domain\Exception\Post\InvalidPostIdException;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Rhumsaa\Uuid\Uuid;
 
 class PostIdSpec extends ObjectBehavior
 {
+    const TEST_UUID = '56c57e60-32e3-4e6a-93cf-87143daef5b8';
+
+    function let()
+    {
+        $this->beConstructedThrough('create', [self::TEST_UUID]);
+    }
+
     function it_is_initializable()
     {
         $this->shouldHaveType(PostId::class);
+    }
+
+    function it_should_allow_retrieving_id()
+    {
+        $this->id()->shouldBeLike(self::TEST_UUID);
     }
 
     function it_should_not_allow_non_uuid_or_blank_ids()
@@ -30,14 +42,13 @@ class PostIdSpec extends ObjectBehavior
             try {
                 $this->getWrappedObject();
                 throw new \RuntimeException($value);
-            } catch (\InvalidArgumentException $e) {}
+            } catch (InvalidPostIdException $e) {}
         }
     }
 
     function it_should_be_castable_to_string()
     {
-        $uuid = Uuid::uuid4();
-        $this->beConstructedThrough('create', [$uuid->toString()]);
-        $this->__toString()->shouldBe($uuid->toString());
+        $this->beConstructedThrough('create', [self::TEST_UUID]);
+        $this->__toString()->shouldBe(self::TEST_UUID);
     }
 }

@@ -9,7 +9,6 @@ use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
 use Gorka\Blog\Domain\Model\AggregateHistory;
-use Gorka\Blog\Domain\Model\EventHistory;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\PostId;
 
@@ -29,9 +28,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     private $exception;
 
     /**
-     * @var EventHistory
+     * @var DomainEvent[]
      */
-    private $eventHistory;
+    private $events;
 
     /**
      * Initializes context.
@@ -42,7 +41,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function __construct()
     {
-        $this->eventHistory = new EventHistory();
+        $this->events = [];
     }
 
     /**
@@ -85,7 +84,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwascreatedEventWithIdTitleAndContent($id, $title, $content)
     {
-        $events = $this->filterByEventType($this->post?$this->post->recordedEvents()->events():[], PostWasCreated::class);
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasCreated::class);
         foreach ($events as $event) {
             if ($event->aggregateId() == $id && $event->postTitle() == $title && $event->postContent() == $content) {
                 return;
@@ -102,8 +101,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function APostWithIdExistsWithTitleAndContent($id, $title, $content)
     {
         $postId = PostId::create($id);
-        $this->eventHistory->add(new PostWasCreated($postId, $title, $content));
-        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->eventHistory));
+        $this->events[] = new PostWasCreated($postId, $title, $content);
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->events));
     }
 
     /**
@@ -123,7 +122,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function IShouldSeeAPosttitlewaschangedEventWithIdAndTitle($id, $newTitle)
     {
-        $events = $this->filterByEventType($this->post->recordedEvents()->events(), PostTitleWasChanged::class);
+        $events = $this->filterByEventType($this->post->recordedEvents(), PostTitleWasChanged::class);
         foreach ($events as $event) {
             if ($event->aggregateId() == $id && $event->postTitle() == $newTitle) {
                 return;
@@ -165,7 +164,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostcontentwaschangedEventWithIdAndContent($id, $content)
     {
-        $events = $this->filterByEventType($this->post->recordedEvents()->events(), PostContentWasChanged::class);
+        $events = $this->filterByEventType($this->post->recordedEvents(), PostContentWasChanged::class);
         foreach ($events as $event) {
             if ($event->aggregateId() == $id) return;
         }
@@ -187,7 +186,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function noNewEventsShouldHaveBeenRecorded()
     {
-        $events = $this->post?$this->post->recordedEvents()->events():[];
+        $events = $this->post?$this->post->recordedEvents():[];
         if (count($events) > 0) {
             throw new \Exception("No events should have been recorded, ".count($events)." found");
         }
@@ -210,7 +209,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwaspublishedEventWithId($id)
     {
-        $events = $this->filterByEventType($this->post?$this->post->recordedEvents()->events():[], PostWasPublished::class);
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasPublished::class);
         foreach ($events as $event) {
             if ($event->aggregateId() == $id) {
                 return;
@@ -236,7 +235,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwasunpublishedEventWithId($id)
     {
-        $events = $this->filterByEventType($this->post?$this->post->recordedEvents()->events():[], PostWasUnpublished::class);
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasUnpublished::class);
         foreach ($events as $event) {
             if ($event->aggregateId() == $id) return;
         }
@@ -249,8 +248,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function postWithIdIsPublished($id)
     {
         $postId = PostId::create($id);
-        $this->eventHistory->add(new PostWasPublished($postId));
-        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->eventHistory));
+        $this->events[] = new PostWasPublished($postId);
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->events));
     }
 
     /**
@@ -259,7 +258,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function postWithIdIsUnpublished($id)
     {
         $postId = PostId::create($id);
-        $this->eventHistory->add(new PostWasUnpublished($postId));
-        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->eventHistory));
+        $this->events[] = new PostWasUnpublished($postId);
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->events));
     }
 }
