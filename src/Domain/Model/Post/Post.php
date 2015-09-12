@@ -10,9 +10,7 @@ use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
 use Gorka\Blog\Domain\Model\AggregateHistory;
-use Gorka\Blog\Domain\Model\EventHistory;
 use Gorka\Blog\Domain\Model\EventRecorder;
-use Gorka\Blog\Domain\Model\EventRecording;
 
 class Post extends EventRecorder
 {
