@@ -3,19 +3,24 @@
 namespace spec\Gorka\Blog\Domain\Command\Post;
 
 use Gorka\Blog\Domain\Command\Post\CreatePost;
+use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class CreatePostSpec extends ObjectBehavior
 {
-    const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';
     const POST_TITLE = 'Title';
     const POST_CONTENT = 'Post content';
 
-    function let()
+    const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';
+
+    function let(PostId $postId)
     {
+        $postId->id()->willReturn(self::POST_ID);
+        $postId->__toString()->willReturn(self::POST_ID);
+
         $this->beConstructedWith(
-            self::POST_ID,
+            $postId,
             self::POST_TITLE,
             self::POST_CONTENT
         );
@@ -26,9 +31,9 @@ class CreatePostSpec extends ObjectBehavior
         $this->shouldHaveType(CreatePost::class);
     }
 
-    function it_should_allow_retrieving_post_id()
+    function it_should_allow_retrieving_post_id(PostId $postId)
     {
-        $this->postId()->shouldBe(self::POST_ID);
+        $this->postId()->shouldBeLike($postId);
     }
 
     function it_should_allow_retrieving_post_title()

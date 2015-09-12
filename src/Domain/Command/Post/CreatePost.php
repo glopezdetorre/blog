@@ -23,16 +23,16 @@ class CreatePost implements DomainCommand
      */
     private $postContent;
 
-    public function __construct($id, $postTitle, $postContent)
+    public function __construct(PostId $id, $postTitle, $postContent)
     {
-        $this->postId = PostId::create($id);
+        $this->postId = $id;
         $this->postTitle = $postTitle;
         $this->postContent = $postContent;
     }
 
     public function postId()
     {
-        return $this->postId->__toString();
+        return $this->postId;
     }
 
     public function postTitle()
