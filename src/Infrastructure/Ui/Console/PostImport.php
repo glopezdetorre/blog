@@ -62,6 +62,9 @@ class PostImport extends Command
             $id = PostId::create($this->userIdGenerator->id());
             $title = $input->getArgument('title');
             $this->commandBus->handle(new CreatePost($id, $title, $content));
+
+            // This might not be true: we have put the command on the bus,
+            // there is no guarantee is has been accomplished
             $output->writeln(sprintf('<info>Post with id %s and title %s created</info>', $id, $title));
         } catch (\Exception $e) {
             $output->writeln('<error>Unable to import post:</error> '.$e->getMessage());

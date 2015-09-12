@@ -7,7 +7,7 @@ use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\Post;
 use SimpleBus\Message\Bus\MessageBus;
 
-class CreatePostHandler
+class UnpublishPostHandler
 {
     /**
      * @var EventStore
@@ -29,9 +29,12 @@ class CreatePostHandler
         $this->eventBus = $eventBus;
     }
 
-    public function handle(CreatePost $command)
+    public function handle(UnpublishPost $command)
     {
-        $post = Post::create($command->postId(), $command->postTitle(), $command->postContent());
+        $aggregateEvents = $this->eventStore->events($command->postId());
+        $post = Post::reconstituteFromEvents(new AggregateHistory($command->postId(), $aggregateEvents));
+        $post->unpublish();
+
         $this->eventStore->commit(new AggregateHistory($post->id(), $post->recordedEvents()));
         foreach ($post->recordedEvents() as $event) {
             $this->eventBus->handle($event);

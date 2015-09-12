@@ -13,7 +13,7 @@ class MemoryEventStore implements EventStore
     /**
      * @var DomainEvent[]
      */
-    private $events;
+    private $events = [];
 
     /**
      * @param AggregateHistory $history

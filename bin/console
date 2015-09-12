@@ -3,8 +3,12 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Gorka\Blog\Infrastructure\Ui\Console\PostImport;
 use Pimple\Container;
+use Gorka\Blog\Domain\Command\Post\PublishPostHandler;
+use Gorka\Blog\Domain\Command\Post\UnpublishPostHandler;
+use Gorka\Blog\Infrastructure\Ui\Console\PostImport;
+use Gorka\Blog\Infrastructure\Ui\Console\PostPublish;
+use Gorka\Blog\Infrastructure\Ui\Console\PostUnpublish;
 use Gorka\Blog\Domain\Command\Post\PublishPost;
 use Gorka\Blog\Domain\Command\Post\UnpublishPost;
 use Gorka\Blog\Domain\Command\Post\CreatePost;
@@ -87,7 +91,15 @@ $container['CommandBus'] = function ($container) {
 $container['CreatePostHandler'] = function($container) {
     return new CreatePostHandler($container['EventStore'], $container['EventBus']);
 };
+$container['PublishPostHandler'] = function($container) {
+    return new PublishPostHandler($container['EventStore'], $container['EventBus']);
+};
+$container['UnpublishPostHandler'] = function($container) {
+    return new UnpublishPostHandler($container['EventStore'], $container['EventBus']);
+};
 
 $application = new Application();
 $application->add(new PostImport($container['CommandBus'], $container['IdGenerator']));
+$application->add(new PostPublish($container['CommandBus']));
+$application->add(new PostUnpublish($container['CommandBus']));
 $application->run();
