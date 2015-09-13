@@ -1,0 +1,19 @@
+default:
+    rules:
+        cyclomaticComplexity: [ 10, 6, 2 ]
+
+    failure: average.maintainabilityIndex < 50 or sum.loc > 10000
+
+    path:
+        directory: src
+        extensions: php
+
+    logging:
+        report:
+            xml:    ./build/report/phpmetrics/phpmetrics.xml
+            html:   ./build/report/phpmetrics/phpmetrics.html
+            csv:    ./build/report/phpmetrics/phpmetrics.csv
+        violations:
+            xml:    ./build/report/phpmetrics/violations.xml
+        chart:
+            bubbles: ./build/report/phpmetrics/bubbles.svg

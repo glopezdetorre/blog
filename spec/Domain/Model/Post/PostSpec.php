@@ -9,7 +9,6 @@ use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
 use Gorka\Blog\Domain\Model\AggregateHistory;
-use Gorka\Blog\Domain\Model\AggregateId;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\Exception\Example\FailureException;
@@ -166,12 +165,12 @@ class PostSpec extends ObjectBehavior
 
     function getMatchers() {
         return [
-            'containEvent' => function (AggregateHistory $subject, DomainEvent $event) {
-                $events = array_filter($subject->events(), function ($a) use ($event) { return $a == $event; });
+            'containEvent' => function (array $subject, DomainEvent $event) {
+                $events = array_filter($subject, function ($a) use ($event) { return $a == $event; });
                 return (count($events) > 0);
             },
-            'containEventTimes' => function (AggregateHistory $subject, DomainEvent $event, $times) {
-                $events = array_filter($subject->events(), function ($a) use ($event) { return $a == $event; });
+            'containEventTimes' => function (array $subject, DomainEvent $event, $times) {
+                $events = array_filter($subject, function ($a) use ($event) { return $a == $event; });
                 if (count($events) !== $times) {
                     throw new FailureException(
                         sprintf(

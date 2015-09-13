@@ -3,40 +3,41 @@
 namespace Gorka\Blog\Domain\Command\Post;
 
 use Gorka\Blog\Domain\Command\DomainCommand;
+use Gorka\Blog\Domain\Model\Post\PostId;
 
 class CreatePost implements DomainCommand
 {
 
     /**
- * @var  string
-*/
+     * @var PostId
+     */
+    private $postId;
+
+    /**
+     * @var string
+     */
     private $postTitle;
 
     /**
-     * @var \DateTimeImmutable
+     * @var string
      */
-    private $postCreationDateTime;
-
-    /**
- * @var  string
-*/
     private $postContent;
 
-    public function __construct($postTitle, \DateTimeImmutable $postCreationDateTime, $postContent)
+    public function __construct(PostId $id, $postTitle, $postContent)
     {
+        $this->postId = $id;
         $this->postTitle = $postTitle;
-        $this->postCreationDateTime = $postCreationDateTime;
         $this->postContent = $postContent;
+    }
+
+    public function postId()
+    {
+        return $this->postId;
     }
 
     public function postTitle()
     {
         return $this->postTitle;
-    }
-
-    public function postCreationDateTime()
-    {
-        return $this->postCreationDateTime;
     }
 
     public function postContent()

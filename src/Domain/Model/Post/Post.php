@@ -10,24 +10,18 @@ use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
 use Gorka\Blog\Domain\Model\AggregateHistory;
-use Gorka\Blog\Domain\Model\EventHistory;
-use Gorka\Blog\Domain\Model\EventRecording;
+use Gorka\Blog\Domain\Model\EventRecorder;
 
-class Post implements EventRecording
+class Post extends EventRecorder
 {
     /**
- * @var PostId
-*/
+     * @var PostId
+     */
     private $id;
 
     /**
- * @var EventHistory
-*/
-    private $events;
-
-    /**
- * @var bool
-*/
+     * @var bool
+     */
     private $published;
 
     /**
@@ -37,7 +31,6 @@ class Post implements EventRecording
     {
         $this->id = $id;
         $this->published = false;
-        $this->events = new AggregateHistory($id);
     }
 
     public static function create(PostId $id, $title, $content)
@@ -84,30 +77,17 @@ class Post implements EventRecording
         $this->recordThat(new PostWasUnpublished($this->id));
     }
 
-    public function recordedEvents()
-    {
-        return $this->events;
-    }
-
-    public function recordThat(DomainEvent $event)
-    {
-        $this->events->add($event);
-        $this->apply($event);
-    }
-
     public static function reconstituteFromEvents(AggregateHistory $aggregateHistory)
     {
-        $id = $aggregateHistory->aggregateId();
-        $postId = PostId::create($id->id());
-        $post = new Post($postId);
-
+        $id = PostId::create($aggregateHistory->aggregateId());
+        $post = new Post($id);
         foreach ($aggregateHistory->events() as $event) {
             $post->apply($event);
         }
         return $post;
     }
 
-    private function apply(DomainEvent $event)
+    protected function apply(DomainEvent $event)
     {
         $methodName = 'apply'.(new \ReflectionClass($event))->getShortName();
         if (method_exists($this, $methodName)) {

@@ -1,0 +1,109 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Pimple\Container;
+use Gorka\Blog\Domain\Command\Post\PublishPostHandler;
+use Gorka\Blog\Domain\Command\Post\UnpublishPostHandler;
+use Gorka\Blog\Infrastructure\Ui\Console\PostImport;
+use Gorka\Blog\Infrastructure\Ui\Console\PostPublish;
+use Gorka\Blog\Infrastructure\Ui\Console\PostUnpublish;
+use Gorka\Blog\Domain\Command\Post\PublishPost;
+use Gorka\Blog\Domain\Command\Post\UnpublishPost;
+use Gorka\Blog\Domain\Command\Post\CreatePost;
+use Gorka\Blog\Domain\Command\Post\CreatePostHandler;
+use Gorka\Blog\Domain\Event\Post\PostWasCreated;
+use Gorka\Blog\Domain\Service\UuidGenerator;
+use Gorka\Blog\Infrastructure\Data\EventStore\MemoryEventStore;
+use SimpleBus\Message\Bus\Middleware\FinishesHandlingMessageBeforeHandlingNext;
+use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
+use SimpleBus\Message\CallableResolver\CallableCollection;
+use SimpleBus\Message\CallableResolver\CallableMap;
+use SimpleBus\Message\CallableResolver\ServiceLocatorAwareCallableResolver;
+use SimpleBus\Message\Handler\DelegatesToMessageHandlerMiddleware;
+use SimpleBus\Message\Handler\Resolver\NameBasedMessageHandlerResolver;
+use SimpleBus\Message\Name\ClassBasedNameResolver;
+use SimpleBus\Message\Subscriber\NotifiesMessageSubscribersMiddleware;
+use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
+use Symfony\Component\Console\Application;
+
+$container = new Container();
+
+$container['QuestionHelper'] = function() {
+    return new \Symfony\Component\Console\Helper\QuestionHelper();
+};
+
+$container['IdGenerator'] = function() {
+    return new UuidGenerator();
+};
+
+$container['EventStore'] = function () {
+    return new MemoryEventStore();
+};
+
+$container['EventBus'] = function ($container) {
+    $serviceLocator = function ($serviceName) use ($container) {
+        return $container[$serviceName];
+    };
+    $eventSubscriberCollection = new CallableCollection(
+        [
+            PostWasCreated::class => []
+        ],
+        new ServiceLocatorAwareCallableResolver($serviceLocator)
+    );
+    $eventSubscribersResolver = new NameBasedMessageSubscriberResolver(
+        new ClassBasedNameResolver(),
+        $eventSubscriberCollection
+    );
+    $eventBus = new MessageBusSupportingMiddleware(
+        [
+            new FinishesHandlingMessageBeforeHandlingNext(),
+            new NotifiesMessageSubscribersMiddleware(
+                $eventSubscribersResolver
+            )
+        ]
+    );
+    return $eventBus;
+};
+
+$container['CommandBus'] = function ($container) {
+    $serviceLocator = function ($serviceName) use ($container) {
+        return $container[$serviceName];
+    };
+    $commandHandlerMap = new CallableMap(
+        [
+            CreatePost::class => ['CreatePostHandler', 'handle'],
+            PublishPost::class => ['PublishPostHandler', 'handle'],
+            UnpublishPost::class => ['UnpublishPostHandler', 'handle']
+        ],
+        new ServiceLocatorAwareCallableResolver($serviceLocator)
+    );
+    $commandHandlerResolver = new NameBasedMessageHandlerResolver(
+        new ClassBasedNameResolver(),
+        $commandHandlerMap
+    );
+    $commandBus = new MessageBusSupportingMiddleware(
+        [
+            new FinishesHandlingMessageBeforeHandlingNext(),
+            new DelegatesToMessageHandlerMiddleware($commandHandlerResolver)
+        ]
+    );
+    return $commandBus;
+};
+
+$container['CreatePostHandler'] = function($container) {
+    return new CreatePostHandler($container['EventStore'], $container['EventBus']);
+};
+$container['PublishPostHandler'] = function($container) {
+    return new PublishPostHandler($container['EventStore'], $container['EventBus']);
+};
+$container['UnpublishPostHandler'] = function($container) {
+    return new UnpublishPostHandler($container['EventStore'], $container['EventBus']);
+};
+
+$application = new Application();
+$application->add(new PostImport($container['CommandBus'], $container['IdGenerator'], $container['QuestionHelper']));
+$application->add(new PostPublish($container['CommandBus']));
+$application->add(new PostUnpublish($container['CommandBus']));
+$application->run();

@@ -1,26 +1,23 @@
 <?php
 
-namespace Gorka\Blog\Infrastructure\Adapter\EventStore;
+namespace Gorka\Blog\Infrastructure\Data\EventStore;
 
 use Gorka\Blog\Domain\Event\DomainEvent;
-use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\AggregateId;
-use Gorka\Blog\Domain\Model\Post\PostId;
+use Gorka\Blog\Domain\Model\EventStore;
 
-class MemoryEventStore
+class MemoryEventStore implements EventStore
 {
 
     /**
      * @var DomainEvent[]
      */
-    private $events;
+    private $events = [];
 
-    public function __construct()
-    {
-        $this->events = [];
-    }
-
+    /**
+     * @param AggregateHistory $history
+     */
     public function commit(AggregateHistory $history)
     {
         foreach ($history->events() as $event) {
@@ -28,15 +25,17 @@ class MemoryEventStore
         }
     }
 
-    public function aggregateHistory(AggregateId $id)
+    /**
+     * @param AggregateId $id
+     * @return DomainEvent[]
+     */
+    public function events(AggregateId $id)
     {
-        $events = array_filter(
+        return array_filter(
             $this->events,
             function ($event) use ($id) {
                 return $event->aggregateId() == $id;
             }
         );
-
-        return new AggregateHistory($id, $events);
     }
 }
