@@ -60,10 +60,35 @@ class PostImportSpec extends ObjectBehavior
         $this->execute($input, $output);
     }
 
-    private function createFile($fileName, $content)
+    function it_should_not_put_commands_on_bus_on_file_not_found(
+        InputInterface $input,
+        OutputInterface $output,
+        MessageBus $commandBus
+    ) {
+        $input->getArgument('file')->willReturn('vfs://workdir/'.self::TEST_FILENAME);
+
+        $commandBus->handle(Argument::any())->shouldNotBeCalled();
+        $output->writeln(Argument::containingString('Unable to import post'))->shouldBeCalled();
+        $this->execute($input, $output);
+    }
+
+    function it_should_not_put_commands_on_bus_on_file_unreaedable(
+        InputInterface $input,
+        OutputInterface $output,
+        MessageBus $commandBus
+    ) {
+        $input->getArgument('file')->willReturn('vfs://workdir/'.self::TEST_FILENAME);
+        $this->createFile(self::TEST_FILENAME, self::TEST_CONTENT, 0222);
+
+        $commandBus->handle(Argument::any())->shouldNotBeCalled();
+        $output->writeln(Argument::containingString('Unable to import post'))->shouldBeCalled();
+        $this->execute($input, $output);
+    }
+
+    private function createFile($fileName, $content, $permissions = 0664)
     {
         $file = vfsStream::newFile($fileName);
-        $file->setContent($content);
+        $file->setContent($content)->chmod($permissions);
         $this->workdir->addChild($file);
     }
 }
