@@ -30,6 +30,10 @@ use Symfony\Component\Console\Application;
 
 $container = new Container();
 
+$container['QuestionHelper'] = function() {
+    return new \Symfony\Component\Console\Helper\QuestionHelper();
+};
+
 $container['IdGenerator'] = function() {
     return new UuidGenerator();
 };
@@ -99,7 +103,7 @@ $container['UnpublishPostHandler'] = function($container) {
 };
 
 $application = new Application();
-$application->add(new PostImport($container['CommandBus'], $container['IdGenerator']));
+$application->add(new PostImport($container['CommandBus'], $container['IdGenerator'], $container['QuestionHelper']));
 $application->add(new PostPublish($container['CommandBus']));
 $application->add(new PostUnpublish($container['CommandBus']));
 $application->run();

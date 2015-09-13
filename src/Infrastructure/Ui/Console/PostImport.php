@@ -7,9 +7,11 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Service\UuidGenerator;
 use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 
 class PostImport extends Command
 {
@@ -24,23 +26,29 @@ class PostImport extends Command
     private $userIdGenerator;
 
     /**
+     * @var QuestionHelper
+     */
+    private $questionHelper;
+
+    /**
      * @param MessageBus $commandBus
      * @param UuidGenerator $userIdGenerator
+     * @param QuestionHelper $questionHelper
      */
-    public function __construct(MessageBus $commandBus, UuidGenerator $userIdGenerator)
+    public function __construct(MessageBus $commandBus, UuidGenerator $userIdGenerator, QuestionHelper $questionHelper)
     {
         parent::__construct();
         $this->commandBus = $commandBus;
         $this->userIdGenerator = $userIdGenerator;
+        $this->questionHelper = $questionHelper;
     }
 
     protected function configure()
     {
         $this
             ->setName('post:import')
-            ->setDescription('Import post from markdown file')
-            ->addArgument('title', InputArgument::REQUIRED, 'Post title')
-            ->addArgument('file', InputArgument::REQUIRED, 'Post content')
+            ->setDescription('Import post from file')
+            ->addArgument('file', InputArgument::REQUIRED, 'File to import');
         ;
     }
 
@@ -51,16 +59,21 @@ class PostImport extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $fileName = $input->getArgument('file');
+
         try {
-            $file = $input->getArgument('file');
-            if (file_exists($file) && is_readable($file)) {
-                $content = file_get_contents($file);
-            } else {
-                throw new \InvalidArgumentException('File not found or unable to read file');
+            if (!file_exists($fileName)) {
+                throw new \InvalidArgumentException('File not found');
+            }
+
+            if (!is_readable($fileName)) {
+                throw new \InvalidArgumentException('File cannot be read');
             }
 
             $id = PostId::create($this->userIdGenerator->id());
-            $title = $input->getArgument('title');
+            $content = file_get_contents($fileName);
+            $title = $this->questionHelper->ask($input, $output, new Question('Please enter title for this post: '));
+
             $this->commandBus->handle(new CreatePost($id, $title, $content));
 
             // This might not be true: we have put the command on the bus,
