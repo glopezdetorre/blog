@@ -6,6 +6,7 @@ use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\AggregateId;
 use Gorka\Blog\Infrastructure\Data\EventStore\MemoryEventStore;
+use Gorka\Blog\Infrastructure\Exception\Data\DataNotFoundException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -28,7 +29,6 @@ class MemoryEventStoreSpec extends ObjectBehavior
 
     function it_should_filter_events_by_given_aggregate_id(
         AggregateId $id,
-        AggregateId $id2,
         DomainEvent $domainEvent,
         AggregateHistory $history
     ) {
@@ -37,6 +37,11 @@ class MemoryEventStoreSpec extends ObjectBehavior
         $history->events()->willReturn([$domainEvent]);
 
         $this->commit($history);
-        $this->events($id2)->shouldBe([]);
+        $this->events($id)->shouldBe([$domainEvent]);
+    }
+
+    function it_should_throw_exception_on_aggregate_history_not_found(AggregateId $id)
+    {
+        $this->shouldThrow(DataNotFoundException::class)->during('events', [$id]);
     }
 }
