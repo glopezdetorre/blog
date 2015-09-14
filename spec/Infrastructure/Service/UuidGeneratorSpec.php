@@ -1,8 +1,8 @@
 <?php
 
-namespace spec\Gorka\Blog\Domain\Service;
+namespace spec\Gorka\Blog\Infrastructure\Service;
 
-use Gorka\Blog\Domain\Service\UuidGenerator;
+use Gorka\Blog\Infrastructure\Service\UuidGenerator;
 use PhpSpec\Exception\Example\FailureException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
