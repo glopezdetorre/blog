@@ -6,6 +6,7 @@ use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\AggregateId;
 use Gorka\Blog\Domain\Model\EventStore;
+use Gorka\Blog\Infrastructure\Exception\Data\DataNotFoundException;
 
 class MemoryEventStore implements EventStore
 {
@@ -27,15 +28,22 @@ class MemoryEventStore implements EventStore
 
     /**
      * @param AggregateId $id
-     * @return DomainEvent[]
+     * @return \Gorka\Blog\Domain\Event\DomainEvent[]
+     * @throws DataNotFoundException
      */
     public function events(AggregateId $id)
     {
-        return array_filter(
+        $events = array_filter(
             $this->events,
             function ($event) use ($id) {
                 return $event->aggregateId() == $id;
             }
         );
+
+        if (count($events) == 0) {
+            throw new DataNotFoundException();
+        }
+
+        return $events;
     }
 }
