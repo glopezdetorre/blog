@@ -12,4 +12,9 @@ class SystemClockSpec extends ObjectBehavior
     {
         $this->shouldHaveType(SystemClock::class);
     }
+
+    function it_should_return_current_time()
+    {
+        $this->now()->shouldBeLike(new \DateTimeImmutable());
+    }
 }
