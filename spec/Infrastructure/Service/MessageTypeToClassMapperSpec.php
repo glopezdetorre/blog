@@ -1,10 +1,10 @@
 <?php
 
-namespace spec\Gorka\Blog\Infrastructure\Data\Message;
+namespace spec\Gorka\Blog\Infrastructure\Service;
 
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
-use Gorka\Blog\Infrastructure\Data\Message\MessageTypeToClassMapper;
+use Gorka\Blog\Infrastructure\Service\MessageTypeToClassMapper;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 

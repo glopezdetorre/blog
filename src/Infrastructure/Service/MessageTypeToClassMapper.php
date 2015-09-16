@@ -1,6 +1,6 @@
 <?php
 
-namespace Gorka\Blog\Infrastructure\Data\Message;
+namespace Gorka\Blog\Infrastructure\Service;
 
 use Assert\Assertion;
 
