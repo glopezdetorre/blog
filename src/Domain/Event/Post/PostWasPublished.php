@@ -17,8 +17,18 @@ class PostWasPublished implements DomainEvent
         $this->postId = $postId;
     }
 
+    public function postId()
+    {
+        return $this->aggregateId();
+    }
+
     public function aggregateId()
     {
         return $this->postId;
+    }
+
+    public function messageName()
+    {
+        return 'blog:post_was_published';
     }
 }

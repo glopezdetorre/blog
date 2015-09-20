@@ -4,7 +4,7 @@ namespace spec\Gorka\Blog\Infrastructure\Ui\Console;
 
 use Gorka\Blog\Domain\Command\Post\CreatePost;
 use Gorka\Blog\Domain\Model\Post\PostId;
-use Gorka\Blog\Domain\Service\UuidGenerator;
+use Gorka\Blog\Domain\Service\IdGenerator;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use Prophecy\Argument;
@@ -27,7 +27,7 @@ class PostImportSpec extends ObjectBehavior
      */
     private $workdir;
 
-    function let(MessageBus $commandBus, UuidGenerator $idGenerator, QuestionHelper $questionHelper)
+    function let(MessageBus $commandBus, IdGenerator $idGenerator, QuestionHelper $questionHelper)
     {
         $this->workdir = vfsStream::setup('workdir');
         $idGenerator->id()->willReturn(self::TEST_ID);

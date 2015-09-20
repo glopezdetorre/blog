@@ -34,6 +34,11 @@ class PostWasCreated implements DomainEvent
         return $this->postId;
     }
 
+    public function postId()
+    {
+        return $this->aggregateId();
+    }
+
     public function postTitle()
     {
         return $this->postTitle;
@@ -42,5 +47,10 @@ class PostWasCreated implements DomainEvent
     public function postContent()
     {
         return $this->postContent;
+    }
+
+    public function messageName()
+    {
+        return 'blog:post_was_created';
     }
 }

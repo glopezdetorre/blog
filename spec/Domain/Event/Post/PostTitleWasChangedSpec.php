@@ -25,10 +25,16 @@ class PostTitleWasChangedSpec extends ObjectBehavior
     function it_should_allow_getting_post_id()
     {
         $this->aggregateId()->shouldBeLike(self::POST_ID);
+        $this->postId()->shouldBeLike(self::POST_ID);
     }
 
     function it_should_allow_getting_post_title()
     {
         $this->postTitle()->shouldBeLike(self::POST_TITLE);
+    }
+
+    function it_should_allow_retrieving_message_name()
+    {
+        $this->messageName()->shouldBe('blog:post_title_was_changed');
     }
 }
