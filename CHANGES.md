@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/09/20
+
+- Message serialization
+
 ## 2015/09/13
 
 - UI commands
