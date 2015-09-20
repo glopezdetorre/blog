@@ -37,4 +37,17 @@ class PostContentWasChanged implements DomainEvent
     {
         return $this->id;
     }
+
+    /**
+     * @return AggregateId
+     */
+    public function postId()
+    {
+        return $this->aggregateId();
+    }
+
+    public function messageName()
+    {
+        return 'blog:post_content_was_changed';
+    }
 }

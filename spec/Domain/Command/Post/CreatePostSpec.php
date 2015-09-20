@@ -44,4 +44,9 @@ class CreatePostSpec extends ObjectBehavior
     {
         $this->postContent()->shouldBe(self::POST_CONTENT);
     }
+
+    function it_should_allow_retrieving_message_name()
+    {
+        $this->messageName()->shouldBe('blog:create_post');
+    }
 }

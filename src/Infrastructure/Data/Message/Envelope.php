@@ -2,43 +2,44 @@
 
 namespace Gorka\Blog\Infrastructure\Data\Message;
 
-use Gorka\Blog\Infrastructure\Service\Serializer\Serializer;
+use Gorka\Blog\Domain\Model\DomainMessage;
 
 class Envelope
 {
-    /**
-     * @var Message
-     */
-    private $message;
 
     /**
      * @var \DateTimeImmutable
      */
     private $creationTime;
 
-    public function __construct(Message $message, \DateTimeImmutable $creationTime)
+    /**
+     * @var DomainMessage
+     */
+    private $message;
+
+    /**
+     * @param DomainMessage $message
+     * @param \DateTimeImmutable $creationTime
+     */
+    public function __construct(DomainMessage $message, \DateTimeImmutable $creationTime)
     {
         $this->message = $message;
         $this->creationTime = $creationTime;
     }
 
+    /**
+     * @return DomainMessage
+     */
     public function message()
     {
         return $this->message;
     }
 
+    /**
+     * @return \DateTimeImmutable
+     */
     public function creationTime()
     {
         return $this->creationTime;
-    }
-
-    public function serialize()
-    {
-        return Serializer::serialize($this);
-    }
-
-    public static function fromSerialized($serialized)
-    {
-        return Serializer::deserialize($serialized, self::class);
     }
 }

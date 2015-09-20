@@ -44,4 +44,9 @@ class CreatePost implements DomainCommand
     {
         return $this->postContent;
     }
+
+    public function messageName()
+    {
+        return 'blog:create_post';
+    }
 }
