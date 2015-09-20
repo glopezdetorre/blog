@@ -25,4 +25,9 @@ class UnpublishPostSpec extends ObjectBehavior
     {
         $this->postId()->shouldBeLike(self::POST_ID);
     }
+
+    function it_should_allow_retrieving_message_name()
+    {
+        $this->messageName()->shouldBe('blog:unpublish_post');
+    }
 }

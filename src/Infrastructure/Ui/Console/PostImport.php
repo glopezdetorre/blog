@@ -4,7 +4,7 @@ namespace Gorka\Blog\Infrastructure\Ui\Console;
 
 use Gorka\Blog\Domain\Command\Post\CreatePost;
 use Gorka\Blog\Domain\Model\Post\PostId;
-use Gorka\Blog\Domain\Service\UuidGenerator;
+use Gorka\Blog\Domain\Service\IdGenerator;
 use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -21,7 +21,7 @@ class PostImport extends Command
     private $commandBus;
 
     /**
-     * @var UuidGenerator User ID generator
+     * @var IdGenerator User ID generator
      */
     private $userIdGenerator;
 
@@ -32,10 +32,10 @@ class PostImport extends Command
 
     /**
      * @param MessageBus $commandBus
-     * @param UuidGenerator $userIdGenerator
+     * @param IdGenerator $userIdGenerator
      * @param QuestionHelper $questionHelper
      */
-    public function __construct(MessageBus $commandBus, UuidGenerator $userIdGenerator, QuestionHelper $questionHelper)
+    public function __construct(MessageBus $commandBus, IdGenerator $userIdGenerator, QuestionHelper $questionHelper)
     {
         parent::__construct();
         $this->commandBus = $commandBus;

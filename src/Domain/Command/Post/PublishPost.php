@@ -24,4 +24,9 @@ class PublishPost implements DomainCommand
     {
         return $this->postId;
     }
+
+    public function messageName()
+    {
+        return 'blog:publish_post';
+    }
 }

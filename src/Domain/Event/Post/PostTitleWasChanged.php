@@ -27,6 +27,11 @@ class PostTitleWasChanged implements DomainEvent
         $this->postTitle = $postTitle;
     }
 
+    public function postId()
+    {
+        return $this->aggregateId();
+    }
+
     /**
      * @return string
      */
@@ -41,5 +46,10 @@ class PostTitleWasChanged implements DomainEvent
     public function aggregateId()
     {
         return $this->id;
+    }
+
+    public function messageName()
+    {
+        return 'blog:post_title_was_changed';
     }
 }

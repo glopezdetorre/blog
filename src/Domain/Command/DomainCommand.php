@@ -2,6 +2,8 @@
 
 namespace Gorka\Blog\Domain\Command;
 
-interface DomainCommand
+use Gorka\Blog\Domain\Model\DomainMessage;
+
+interface DomainCommand extends DomainMessage
 {
 }

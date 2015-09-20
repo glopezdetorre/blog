@@ -25,4 +25,9 @@ class UnpublishPost implements DomainCommand
     {
         return $this->postId;
     }
+
+    public function messageName()
+    {
+        return 'blog:unpublish_post';
+    }
 }
