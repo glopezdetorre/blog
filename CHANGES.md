@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/09/21
+
+- Travis & Scrutinizer integration
+
 ## 2015/09/20
 
 - Message serialization
