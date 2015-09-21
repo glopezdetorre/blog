@@ -8,8 +8,12 @@ extensions:
   - RMiller\BehatSpec\PhpSpecExtension
 
 code_coverage:
-  output: build/coverage
-  format: html
+  output: 
+    html: build/coverage
+    clover: build/coverage/coverage.xml
+  format: 
+    - html
+    - clover
 
 rerunner:
   path: vendor/bin/phpspec
