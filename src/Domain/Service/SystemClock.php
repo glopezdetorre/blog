@@ -5,7 +5,8 @@ namespace Gorka\Blog\Domain\Service;
 interface SystemClock
 {
     /**
+     * @param \DateTimeZone $dtz
      * @return \DateTimeImmutable
      */
-    public function now();
+    public function now(\DateTimeZone $dtz = null);
 }

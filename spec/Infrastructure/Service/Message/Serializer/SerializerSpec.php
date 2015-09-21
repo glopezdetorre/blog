@@ -28,7 +28,7 @@ class SerializerSpec extends ObjectBehavior
         $wrapper->wrap($message)->willReturn(
             new Envelope(
                 $message,
-                \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2015-02-03 12:34:56')
+                \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2015-02-03 12:34:56', new \DateTimeZone('Europe/Madrid'))
             )
         );
 
@@ -40,7 +40,7 @@ class SerializerSpec extends ObjectBehavior
         $expectedMessage = new PostWasPublished(PostId::create('25769c6c-d34d-4bfe-ba98-e0ee856f3e7a'));
         $envelope = new Envelope(
             $expectedMessage,
-            \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2015-02-03 12:34:56')
+            \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2015-02-03 12:34:56', new \DateTimeZone('Europe/Madrid'))
         );
         $wrapper->unwrap($envelope)->willReturn($expectedMessage);
 
