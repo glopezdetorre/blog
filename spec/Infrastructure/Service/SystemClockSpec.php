@@ -15,6 +15,8 @@ class SystemClockSpec extends ObjectBehavior
 
     function it_should_return_current_time()
     {
-        $this->now()->shouldBeLike(new \DateTimeImmutable());
+        $this
+            ->now(new \DateTimeZone('Europe/Madrid'))
+            ->shouldBeLike(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid')));
     }
 }
