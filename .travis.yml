@@ -5,7 +5,7 @@ php:
 before_script:
   - composer install --dev
 
-script: vendor/bin/phpspec run -nq
+script: vendor/bin/phpspec run -n -q
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
