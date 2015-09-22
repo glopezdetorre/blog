@@ -2,6 +2,8 @@
 
 namespace Gorka\Blog\Domain\Model;
 
+use Gorka\Blog\Domain\Event\DomainEvent;
+
 /**
  * Interface EventSourcedAggregate
  */
@@ -19,7 +21,7 @@ interface EventSourcedAggregate
     public static function reconstituteFromEvents(AggregateHistory $history);
 
     /**
-     * @return AggregateHistory
+     * @return DomainEvent[]
      */
     public function recordedEvents();
 }

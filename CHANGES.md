@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/09/22
+
+- Minor improvements on Scrutinizer integration
+
 ## 2015/09/21
 
 - Travis & Scrutinizer integration
