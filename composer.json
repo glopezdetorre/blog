@@ -23,7 +23,8 @@
         "phing/phing": "^2.12",
         "sensiolabs/security-checker": "^3.0",
         "halleck45/phpmetrics": "^1.3",
-        "mikey179/vfsStream": "^1.5"
+        "mikey179/vfsStream": "^1.5",
+        "ext-mongo": "*"
     },
     "minimum-stability": "stable",
     "require": {
