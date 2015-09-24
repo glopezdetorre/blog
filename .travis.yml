@@ -4,6 +4,7 @@ php:
 
 before_script:
   - composer install --dev
+  - phpenv config-add travis.ini
 
 script: vendor/bin/phpspec run -n
 
