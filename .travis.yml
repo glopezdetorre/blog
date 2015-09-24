@@ -1,11 +1,9 @@
 language: php
 php:
   - 5.5
-  - 7
+  - 5.6
 
 before_script:
-  - pecl uninstall mongo
-  - yes '' | pecl install -f mongo
   - composer install --dev
   - phpenv config-add travis.ini
 
