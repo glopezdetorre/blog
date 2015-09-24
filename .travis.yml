@@ -5,7 +5,7 @@ php:
 
 before_script:
   - pecl uninstall mongo
-  - pecl install mongo
+  - yes '' | pecl install -f mongo
   - composer install --dev
   - phpenv config-add travis.ini
 
