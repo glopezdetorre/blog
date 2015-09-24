@@ -3,6 +3,7 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
 use Pimple\Container;
 use Gorka\Blog\Infrastructure\Service\UuidGenerator;
 use Gorka\Blog\Domain\Command\Post\PublishPostHandler;
@@ -38,8 +39,21 @@ $container['IdGenerator'] = function() {
     return new UuidGenerator();
 };
 
-$container['EventStore'] = function () {
-    return new MemoryEventStore();
+$container['SystemClock'] = function() {
+    return new \Gorka\Blog\Infrastructure\Service\SystemClock();
+};
+
+$container['Wrapper'] = function($container) {
+    return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Wrapper($container['SystemClock']);
+};
+
+$container['Serializer'] = function ($container) {
+    return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Serializer($container['Wrapper']);
+};
+
+$container['EventStore'] = function ($container) {
+    $mongoClient = new MongoClient();
+    return new MongoEventStore($container['Serializer'], $mongoClient, 'blog', 'events');
 };
 
 $container['EventBus'] = function ($container) {
