@@ -3,8 +3,8 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
 use Pimple\Container;
+use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
 use Gorka\Blog\Infrastructure\Service\UuidGenerator;
 use Gorka\Blog\Domain\Command\Post\PublishPostHandler;
 use Gorka\Blog\Domain\Command\Post\UnpublishPostHandler;
@@ -16,7 +16,6 @@ use Gorka\Blog\Domain\Command\Post\UnpublishPost;
 use Gorka\Blog\Domain\Command\Post\CreatePost;
 use Gorka\Blog\Domain\Command\Post\CreatePostHandler;
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
-use Gorka\Blog\Infrastructure\Data\EventStore\MemoryEventStore;
 use SimpleBus\Message\Bus\Middleware\FinishesHandlingMessageBeforeHandlingNext;
 use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
 use SimpleBus\Message\CallableResolver\CallableCollection;

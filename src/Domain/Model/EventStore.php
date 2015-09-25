@@ -20,7 +20,7 @@ interface EventStore
 {
     /**
      * @param AggregateHistory $history
-     * @throws DataNotFoundException
+     * @throws DataAccessException
      */
     public function commit(AggregateHistory $history);
 

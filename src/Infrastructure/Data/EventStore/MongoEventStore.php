@@ -49,12 +49,16 @@ class MongoEventStore implements EventStore
     {
         try {
             $eventBatch = $this->prepareEventBatch($history->events());
-            $this->mongoClient
+            $result = $this->mongoClient
                 ->selectCollection($this->databaseName, $this->collectionName)
                 ->batchInsert($eventBatch);
             ;
         } catch (\Exception $e) {
             throw new DataAccessException($e->getMessage());
+        }
+
+        if (!$result) {
+            throw new DataAccessException('Unable to persist events');
         }
     }
 
@@ -72,15 +76,25 @@ class MongoEventStore implements EventStore
                 ->find(['message.payload.id' => $id->id()])
                 ->sort(['creation_time' => 1])
             ;
+        } catch (\Exception $e) {
+            throw new DataAccessException($e->getMessage());
+        }
 
+
+        if (!$serializedEvents || $serializedEvents->count() == 0) {
+            throw new DataNotFoundException('No events found for the given ID');
+        }
+
+        try {
             $events = [];
             foreach ($serializedEvents as $serializedEvent) {
                 $events[] = $this->serializer->deserialize(json_encode($serializedEvent));
             }
-            return $events;
         } catch (\Exception $e) {
             throw new DataAccessException($e->getMessage());
         }
+
+        return $events;
     }
 
     /**
