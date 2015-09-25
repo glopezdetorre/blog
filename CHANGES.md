@@ -1,5 +1,10 @@
 # Changes
 
+## 2015/09/25
+
+- Mongo event store
+- Travis checks for php versions 5.5 and 5.6
+
 ## 2015/09/22
 
 - Minor improvements on Scrutinizer integration

@@ -33,6 +33,9 @@
         "pimple/pimple": "^3.0",
         "simple-bus/message-bus": "^2.2"
     },
+    "suggest": {
+        "ext-mongo": "Allows use of the mongo event store"
+    },
     "scripts": {
         "post-install-cmd": [
             "vendor/bin/phing githook:install"
