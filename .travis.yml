@@ -1,11 +1,13 @@
 language: php
 php:
   - 5.5
+  - 5.6
 
 before_script:
   - composer install --dev
+  - phpenv config-add travis.ini
 
-script: vendor/bin/phpspec run -n -q
+script: vendor/bin/phpspec run -n
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
