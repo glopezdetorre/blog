@@ -3,6 +3,8 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
+use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
 use Pimple\Container;
 use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
 use Gorka\Blog\Infrastructure\Service\UuidGenerator;
@@ -119,4 +121,6 @@ $application = new Application();
 $application->add(new PostImport($container['CommandBus'], $container['IdGenerator'], $container['QuestionHelper']));
 $application->add(new PostPublish($container['CommandBus']));
 $application->add(new PostUnpublish($container['CommandBus']));
+$application->add(new PostTag($container['CommandBus']));
+$application->add(new PostUntag($container['CommandBus']));
 $application->run();

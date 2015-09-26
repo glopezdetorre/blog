@@ -7,10 +7,13 @@ use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
+use Gorka\Blog\Domain\Event\Post\PostWasTagged;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
+use Gorka\Blog\Domain\Event\Post\PostWasUntagged;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\PostId;
+use Gorka\Blog\Domain\Model\Post\Tag;
 use PhpSpec\Exception\Example\FailureException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -140,6 +143,44 @@ class PostSpec extends ObjectBehavior
         $unexpectedEvent = new PostWasUnpublished(PostId::create(self::POST_ID));
         $this->unpublish();
         $this->recordedEvents()->shouldNotContainEvent($unexpectedEvent);
+    }
+
+    function it_should_record_tagging_with_new_tags(Tag $tag)
+    {
+        $this->addTag($tag);
+        $this->recordedEvents()->shouldContainEvent(
+            new PostWasTagged(PostId::create(self::POST_ID), $tag->getWrappedObject())
+        );
+    }
+
+    function it_should_not_record_tagging_of_existing_tags(Tag $tag)
+    {
+        $this->addTag($tag);
+        $this->addTag($tag);
+        $this->recordedEvents()->shouldContainEventTimes(
+            new PostWasTagged(PostId::create(self::POST_ID), $tag->getWrappedObject()),
+            1
+        );
+    }
+
+    function it_should_record_untagging_of_existing_tags(Tag $tag)
+    {
+        $this->addTag($tag);
+        $this->removeTag($tag);
+        $this->recordedEvents()->shouldContainEvent(
+            new PostWasUntagged(PostId::create(self::POST_ID), $tag->getWrappedObject())
+        );
+    }
+
+    function it_should_not_record_untagging_of_unexisting_tags(Tag $tag)
+    {
+        $this->addTag($tag);
+        $this->removeTag($tag);
+        $this->removeTag($tag);
+        $this->recordedEvents()->shouldContainEventTimes(
+            new PostWasUntagged(PostId::create(self::POST_ID), $tag->getWrappedObject()),
+            1
+        );
     }
 
     /**
