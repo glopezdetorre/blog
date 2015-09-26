@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/09/26
+
+- Added post tagging support
+
 ## 2015/09/25
 
 - Mongo event store
