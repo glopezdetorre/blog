@@ -3,12 +3,15 @@
 namespace Gorka\Blog\Domain\Model\Post;
 
 use Assert\Assertion;
+use Doctrine\Common\Collections\ArrayCollection;
 use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
+use Gorka\Blog\Domain\Event\Post\PostWasTagged;
+use Gorka\Blog\Domain\Event\Post\PostWasUntagged;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventRecorder;
 
@@ -25,12 +28,18 @@ class Post extends EventRecorder
     private $published;
 
     /**
+     * @var Tag[]
+     */
+    private $tags;
+
+    /**
      * @param PostId $id
      */
     private function __construct(PostId $id)
     {
         $this->id = $id;
         $this->published = false;
+        $this->tags = new ArrayCollection();
     }
 
     public static function create(PostId $id, $title, $content)
@@ -77,6 +86,26 @@ class Post extends EventRecorder
         $this->recordThat(new PostWasUnpublished($this->id));
     }
 
+    public function addTag(Tag $tag)
+    {
+        if (in_array($tag, $this->tags->getValues())) {
+            return;
+        }
+
+        $this->tags->add($tag);
+        $this->recordThat(new PostWasTagged($this->id, $tag));
+    }
+
+    public function removeTag(Tag $tag)
+    {
+        if (!in_array($tag, $this->tags->getValues())) {
+            return;
+        }
+
+        $this->tags->removeElement($tag);
+        $this->recordThat(new PostWasUntagged($this->id, $tag));
+    }
+
     public static function reconstituteFromEvents(AggregateHistory $aggregateHistory)
     {
         $id = PostId::create($aggregateHistory->aggregateId());
@@ -95,14 +124,24 @@ class Post extends EventRecorder
         }
     }
 
-    private function applyPostWasPublished(DomainEvent $event)
+    private function applyPostWasPublished(PostWasPublished $event)
     {
         $this->published = true;
     }
 
-    private function applyPostWasUnpublished(DomainEvent $event)
+    private function applyPostWasUnpublished(PostWasUnpublished $event)
     {
         $this->published = false;
+    }
+
+    private function applyPostWasTagged(PostWasTagged $event)
+    {
+        $this->tags->add($event->tag());
+    }
+
+    private function applyPostWasUntagged(PostWasUntagged $event)
+    {
+        $this->tags->removeElement($event->tag());
     }
 
     /**

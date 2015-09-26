@@ -11,13 +11,9 @@ class CreatePostSpec extends ObjectBehavior
 {
     const POST_TITLE = 'Title';
     const POST_CONTENT = 'Post content';
-    const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';
 
     function let(PostId $postId)
     {
-        $postId->id()->willReturn(self::POST_ID);
-        $postId->__toString()->willReturn(self::POST_ID);
-
         $this->beConstructedWith(
             $postId,
             self::POST_TITLE,

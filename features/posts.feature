@@ -122,3 +122,45 @@ Feature: Posts
     Examples:
       | id                                      | title    | content       |
       | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "Title"  | "My content"  |
+
+    Scenario Outline: Tagging a post with a new tag
+      Given A post with id <id> exists with title <title> and content <content>
+        And Post is not tagged with <tag>
+       When I call addTag with <tag>
+       Then I should see a PostWasTagged event with id <id> and tag <tag>
+
+      Examples:
+        | id                                      | title    | content       | tag      |
+        | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "Title"  | "My content"  | "My Tag" |
+
+    Scenario Outline: Tagging a post with an existing tag
+      Given A post with id <id> exists with title <title> and content <content>
+        And Post is tagged with <tag>
+       When I call addTag with <tag>
+       Then I should not see a PostWasTagged event with id <id> and tag <tag>
+
+      Examples:
+        | id                                      | title    | content       | tag      |
+        | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "Title"  | "My content"  | "My Tag" |
+
+    Scenario Outline: Untagging a post with an existing tag
+      Given A post with id <id> exists with title <title> and content <content>
+        And Post is tagged with <tag>
+       When I call removeTag with <tag>
+       Then I should see a PostWasUntagged event with id <id> and tag <tag>
+
+      Examples:
+        | id                                      | title    | content       | tag      |
+        | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "Title"  | "My content"  | "My Tag" |
+
+    Scenario Outline: Untagging a post with an non existing tag
+      Given A post with id <id> exists with title <title> and content <content>
+        And Post is not tagged with <tag>
+       When I call removeTag with <tag>
+       Then I should not see a PostWasUntagged event with id <id> and tag <tag>
+
+      Examples:
+        | id                                      | title    | content       | tag      |
+        | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "Title"  | "My content"  | "My Tag" |
+
+

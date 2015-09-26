@@ -1,5 +1,6 @@
 <?php
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Gorka\Blog\Domain\Event\DomainEvent;
@@ -7,10 +8,13 @@ use Gorka\Blog\Domain\Event\Post\PostContentWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostTitleWasChanged;
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
 use Gorka\Blog\Domain\Event\Post\PostWasPublished;
+use Gorka\Blog\Domain\Event\Post\PostWasTagged;
 use Gorka\Blog\Domain\Event\Post\PostWasUnpublished;
+use Gorka\Blog\Domain\Event\Post\PostWasUntagged;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\PostId;
+use Gorka\Blog\Domain\Model\Post\Tag;
 
 /**
  * Defines application features from the specific context.
@@ -42,6 +46,23 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function __construct()
     {
         $this->events = [];
+    }
+
+
+    /**
+     * @Transform /^(.*)$/i
+     */
+    public function transformEscapedString($arg)
+    {
+        return str_replace(['\n', '\t'], ["\n", "\t"], $arg);
+    }
+
+    /**
+     * @Transform /^null$/i
+     */
+    public function transformNull()
+    {
+        return null;
     }
 
     /**
@@ -129,22 +150,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
             }
         }
         throw new \Exception("Expected PostTitleWasChanged event with id '{$id}' and title '{$newTitle}' was not found");
-    }
-
-    /**
-     * @Transform /^(.*)$/i
-     */
-    public function transformEscapedString($arg)
-    {
-        return str_replace(['\n', '\t'], ["\n", "\t"], $arg);
-    }
-
-    /**
-     * @Transform /^null$/i
-     */
-    public function transformNull()
-    {
-        return null;
     }
 
     /**
@@ -260,5 +265,91 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $postId = PostId::create($id);
         $this->events[] = new PostWasUnpublished($postId);
         $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->events));
+    }
+
+    /**
+     * @Given Post is not tagged with :tag
+     */
+    public function postIsNotTaggedWith($tag)
+    {
+        $this->events[] = new \Gorka\Blog\Domain\Event\Post\PostWasUntagged($this->post->id(), Tag::create($tag));
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($this->post->id(), $this->events));
+    }
+
+    /**
+     * @When I call addTag with :tag
+     */
+    public function iCallAddtagWith($tag)
+    {
+        $this->post->addTag(Tag::create($tag));
+    }
+
+    /**
+     * @Then I should see a PostWasTagged event with id :id and tag :tag
+     */
+    public function iShouldSeeAPostwastaggedEventWithIdAndTag($id, $tag)
+    {
+        $tag = Tag::create($tag);
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasTagged::class);
+        foreach ($events as $event) {
+            if ($event->aggregateId() == $id && $event->tag() == $tag) return;
+        }
+        throw new \Exception("Expected PostWasTagged event with id '{$id}' and tag '{$tag}' was not found");
+    }
+
+    /**
+     * @Given Post is tagged with :tag
+     */
+    public function postIsTaggedWith($tag)
+    {
+        $this->events[] = new PostWasTagged($this->post->id(), Tag::create($tag));
+        $this->post = Post::reconstituteFromEvents(new AggregateHistory($this->post->id(), $this->events));
+    }
+
+    /**
+     * @Then I should not see a PostWasTagged event with id :id and tag :tag
+     */
+    public function iShouldNotSeeAPostwastaggedEventWithIdAndTag($id, $tag)
+    {
+        try {
+            $this->iShouldSeeAPostwastaggedEventWithIdAndTag($id, $tag);
+            throw new \Exception("Unexpected PostWasTagged event with id '{$id}' and tag '{$tag}'");
+        } catch (\Exception $e) {
+            return;
+        }
+    }
+
+    /**
+     * @When I call removeTag with :tag
+     */
+    public function iCallRemovetagWith($tag)
+    {
+        $this->post->removeTag(Tag::create($tag));
+    }
+
+    /**
+     * @Then I should see a PostWasUntagged event with id :id and tag :tag
+     */
+    public function iShouldSeeAPostwasuntaggedEventWithIdAndTag($id, $tag)
+    {
+        $tag = Tag::create($tag);
+        $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasUntagged::class);
+        foreach ($events as $event) {
+            if ($event->aggregateId() == $id && $event->tag() == $tag) return;
+        }
+        throw new \Exception("Expected PostWasUntagged event with id '{$id}' and tag '{$tag}' was not found");
+    }
+
+    /**
+     * @Then I should not see a PostWasUntagged event with id :id and tag :tag
+     */
+    public function iShouldNotSeeAPostwasuntaggedEventWithIdAndTag($id, $tag)
+    {
+        try {
+            $this->iShouldSeeAPostwasuntaggedEventWithIdAndTag($id, $tag);
+            throw new \Exception("Unexpected PostWasUntagged event with id '{$id}' and tag '{$tag}'");
+        } catch (\Exception $e) {
+            return;
+        }
     }
 }
