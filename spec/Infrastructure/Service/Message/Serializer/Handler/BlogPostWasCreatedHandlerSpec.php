@@ -13,6 +13,7 @@ class BlogPostWasCreatedHandlerSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
     const POST_TITLE = 'test title';
+    const POST_SLUG = 'test-title';
     const POST_CONTENT = 'test content';
 
     function it_is_initializable()
@@ -22,10 +23,17 @@ class BlogPostWasCreatedHandlerSpec extends ObjectBehavior
 
     function it_should_serialize_post_was_created_messages()
     {
-        $message = new PostWasCreated(PostId::create(self::POST_ID), self::POST_TITLE, self::POST_CONTENT);
+        $message = new PostWasCreated(
+            PostId::create(self::POST_ID),
+            self::POST_TITLE,
+            self::POST_SLUG,
+            self::POST_CONTENT
+        );
+
         $serializedMessage = [
             'id' => self::POST_ID,
             'title' => self::POST_TITLE,
+            'slug' => self::POST_SLUG,
             'content' => self::POST_CONTENT
         ];
 
@@ -39,10 +47,17 @@ class BlogPostWasCreatedHandlerSpec extends ObjectBehavior
 
     function it_should_unserialize_post_was_created_serialized_messages()
     {
-        $message = new PostWasCreated(PostId::create(self::POST_ID), self::POST_TITLE, self::POST_CONTENT);
+        $message = new PostWasCreated(
+            PostId::create(self::POST_ID),
+            self::POST_TITLE,
+            self::POST_SLUG,
+            self::POST_CONTENT
+        );
+
         $serializedMessage = [
             'id' => self::POST_ID,
             'title' => self::POST_TITLE,
+            'slug' => self::POST_SLUG,
             'content' => self::POST_CONTENT
         ];
 

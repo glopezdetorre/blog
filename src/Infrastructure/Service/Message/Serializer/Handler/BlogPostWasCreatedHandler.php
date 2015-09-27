@@ -23,6 +23,7 @@ class BlogPostWasCreatedHandler implements DomainMessageHandler
         return [
             'id' => ((string) $message->postId()),
             'title' => $message->postTitle(),
+            'slug' => $message->postSlug(),
             'content' => $message->postContent()
         ];
     }
@@ -36,6 +37,6 @@ class BlogPostWasCreatedHandler implements DomainMessageHandler
         if (!is_array($data) || !isset($data['id'], $data['title'], $data['content'])) {
             throw new \LogicException();
         }
-        return new PostWasCreated(PostId::create($data['id']), $data['title'], $data['content']);
+        return new PostWasCreated(PostId::create($data['id']), $data['title'], $data['slug'], $data['content']);
     }
 }

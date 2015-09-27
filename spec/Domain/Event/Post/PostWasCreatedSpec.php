@@ -11,10 +11,11 @@ class PostWasCreatedSpec extends ObjectBehavior
 {
     const TEST_CONTENT = 'My content';
     const TEST_TITLE = 'My title';
+    const TEST_SLUG = 'My title';
 
     function let(PostId $postId)
     {
-        $this->beConstructedWith($postId, self::TEST_TITLE, self::TEST_CONTENT);
+        $this->beConstructedWith($postId, self::TEST_TITLE, self::TEST_SLUG, self::TEST_CONTENT);
     }
 
     function it_is_initializable()
@@ -31,6 +32,11 @@ class PostWasCreatedSpec extends ObjectBehavior
     function it_should_allow_getting_post_title()
     {
         $this->postTitle()->shouldBe(self::TEST_TITLE);
+    }
+
+    function it_should_allow_getting_post_slug()
+    {
+        $this->postSlug()->shouldBe(self::TEST_SLUG);
     }
 
     function it_should_allow_getting_post_content()

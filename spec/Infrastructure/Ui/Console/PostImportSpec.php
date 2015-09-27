@@ -52,6 +52,7 @@ class PostImportSpec extends ObjectBehavior
         $message = new CreatePost(
             PostId::create(self::TEST_ID),
             self::TEST_TITLE,
+            null,
             self::TEST_CONTENT
         );
 

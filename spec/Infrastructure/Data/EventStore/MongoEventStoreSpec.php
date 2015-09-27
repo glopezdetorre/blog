@@ -18,6 +18,7 @@ class MongoEventStoreSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
     const POST_TITLE = 'Test title';
+    const POST_SLUG = 'test-title';
     const POST_CONTENT = 'Test content';
     const TEST_DB = 'testDB';
     const TEST_COLLECTION = 'testCollection';
@@ -159,6 +160,7 @@ class MongoEventStoreSpec extends ObjectBehavior
         $eventCreate = new PostWasCreated(
             $postId,
             self::POST_TITLE,
+            self::POST_SLUG,
             self::POST_CONTENT
         );
         $eventCreateArray = [
@@ -167,6 +169,7 @@ class MongoEventStoreSpec extends ObjectBehavior
                 'payload' => [
                     'id' => self::POST_ID,
                     'title' => self::POST_TITLE,
+                    'slug' => self::POST_SLUG,
                     'content' => self::POST_CONTENT
                 ]
             ],

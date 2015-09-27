@@ -15,6 +15,8 @@ class BlogCreatePostHandlerSpec extends ObjectBehavior
     const POST_TITLE = 'test title';
     const POST_CONTENT = 'test content';
 
+    const POST_SLUG = 'test-title';
+
     function it_is_initializable()
     {
         $this->shouldHaveType(BlogCreatePostHandler::class);
@@ -22,10 +24,11 @@ class BlogCreatePostHandlerSpec extends ObjectBehavior
 
     function it_should_serialize_create_post_messages()
     {
-        $message = new CreatePost(PostId::create(self::POST_ID), self::POST_TITLE, self::POST_CONTENT);
+        $message = new CreatePost(PostId::create(self::POST_ID), self::POST_TITLE, self::POST_SLUG, self::POST_CONTENT);
         $serializedMessage = [
             'id' => self::POST_ID,
             'title' => self::POST_TITLE,
+            'slug' => self::POST_SLUG,
             'content' => self::POST_CONTENT
         ];
 
@@ -39,10 +42,11 @@ class BlogCreatePostHandlerSpec extends ObjectBehavior
 
     function it_should_unserialize_create_post_serialized_messages()
     {
-        $message = new CreatePost(PostId::create(self::POST_ID), self::POST_TITLE, self::POST_CONTENT);
+        $message = new CreatePost(PostId::create(self::POST_ID), self::POST_TITLE, self::POST_SLUG, self::POST_CONTENT);
         $serializedMessage = [
             'id' => self::POST_ID,
             'title' => self::POST_TITLE,
+            'slug' => self::POST_SLUG,
             'content' => self::POST_CONTENT
         ];
 
