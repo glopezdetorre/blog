@@ -20,19 +20,12 @@ class PostUntag extends Command
     private $commandBus;
 
     /**
-     * @var Slugifier
-     */
-    private $slugifier;
-
-    /**
      * @param MessageBus $commandBus
-     * @param Slugifier $slugifier
      */
-    public function __construct(MessageBus $commandBus, Slugifier $slugifier)
+    public function __construct(MessageBus $commandBus)
     {
         parent::__construct();
         $this->commandBus = $commandBus;
-        $this->slugifier = $slugifier;
     }
 
     protected function configure()

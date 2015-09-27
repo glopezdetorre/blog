@@ -19,9 +19,9 @@ class PostTagSpec extends ObjectBehavior
     const TEST_TAG_NAME = 'My tag';
     const TEST_TAG_SLUG = 'my-tag';
 
-    function let(MessageBus $commandBus, Slugifier $slugifier)
+    function let(MessageBus $commandBus)
     {
-        $this->beConstructedWith($commandBus, $slugifier);
+        $this->beConstructedWith($commandBus);
     }
 
     function it_is_initializable()
@@ -32,12 +32,10 @@ class PostTagSpec extends ObjectBehavior
     function it_should_put_publish_command_on_the_bus(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus,
-        Slugifier $slugifier
+        MessageBus $commandBus
     ) {
         $input->getArgument('id')->willReturn(self::TEST_ID);
         $input->getArgument('tag')->willReturn(self::TEST_TAG_NAME);
-        $slugifier->slugify(self::TEST_TAG_NAME)->willReturn(self::TEST_TAG_SLUG);
         $message = new TagPost(PostId::create(self::TEST_ID), Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG));
         $commandBus->handle($message)->shouldBeCalled();
         $output->writeln(Argument::containingString('has been tagged'))->shouldBeCalled();
