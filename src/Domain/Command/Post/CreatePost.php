@@ -23,11 +23,17 @@ class CreatePost implements DomainCommand
      */
     private $postContent;
 
-    public function __construct(PostId $id, $postTitle, $postContent)
+    /**
+     * @var
+     */
+    private $postSlug;
+
+    public function __construct(PostId $id, $postTitle, $postSlug, $postContent)
     {
         $this->postId = $id;
         $this->postTitle = $postTitle;
         $this->postContent = $postContent;
+        $this->postSlug = $postSlug;
     }
 
     public function postId()
@@ -43,6 +49,11 @@ class CreatePost implements DomainCommand
     public function postContent()
     {
         return $this->postContent;
+    }
+
+    public function postSlug()
+    {
+        return $this->postSlug;
     }
 
     public function messageName()

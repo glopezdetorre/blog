@@ -24,9 +24,9 @@ class BlogCreatePostHandler implements DomainMessageHandler
             [
                 'id' => ((string) $message->postId()),
                 'title' => $message->postTitle(),
+                'slug' => $message->postSlug(),
                 'content' => $message->postContent()
-            ]
-            ;
+            ];
     }
 
     /**
@@ -39,6 +39,6 @@ class BlogCreatePostHandler implements DomainMessageHandler
             throw new \LogicException();
         }
 
-        return new CreatePost(PostId::create($data['id']), $data['title'], $data['content']);
+        return new CreatePost(PostId::create($data['id']), $data['title'], $data['slug'], $data['content']);
     }
 }

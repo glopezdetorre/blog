@@ -22,11 +22,23 @@ class PostWasCreated implements DomainEvent
      */
     private $postContent;
 
-    public function __construct(PostId $postId, $postTitle, $postContent)
+    /**
+     * @var string
+     */
+    private $postSlug;
+
+    /**
+     * @param PostId $postId
+     * @param string $postTitle
+     * @param string $postSlug
+     * @param string $postContent
+     */
+    public function __construct(PostId $postId, $postTitle, $postSlug, $postContent)
     {
         $this->postId = $postId;
         $this->postTitle = $postTitle;
         $this->postContent = $postContent;
+        $this->postSlug = $postSlug;
     }
 
     public function aggregateId()
@@ -47,6 +59,11 @@ class PostWasCreated implements DomainEvent
     public function postContent()
     {
         return $this->postContent;
+    }
+
+    public function postSlug()
+    {
+        return $this->postSlug;
     }
 
     public function messageName()

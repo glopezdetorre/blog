@@ -42,12 +42,13 @@ class Post extends EventRecorder
         $this->tags = new ArrayCollection();
     }
 
-    public static function create(PostId $id, $title, $content)
+    public static function create(PostId $id, $title, $slug, $content)
     {
         $post = new static($id);
         $post->guardTitle($title);
+        $post->guardSlug($slug);
         $post->guardContent($content);
-        $post->recordThat(new PostWasCreated($id, $title, $content));
+        $post->recordThat(new PostWasCreated($id, $title, $slug, $content));
         return $post;
     }
 
@@ -160,5 +161,12 @@ class Post extends EventRecorder
     {
         Assertion::string($content, 'Content should be a string');
         Assertion::notBlank(trim($content), 'Content cannot be blank');
+    }
+
+    private function guardSlug($slug)
+    {
+        Assertion::string($slug, 'Slug should be a string');
+        Assertion::notBlank(trim($slug), 'Slug cannot be blank');
+        Assertion::false(preg_replace('/[a-z0-9]/i', '', $slug) == $slug, 'Slug should have content');
     }
 }

@@ -17,6 +17,12 @@ class PublishPostHandlerSpec extends ObjectBehavior
 {
     const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';
 
+    const POST_TITLE = 'My Title';
+
+    const POST_SLUG = 'my-title';
+
+    const POST_CONTENT = 'Content';
+
     function let(EventStore $eventStore, MessageBus $eventBus)
     {
         $this->beConstructedWith($eventStore, $eventBus);
@@ -37,7 +43,7 @@ class PublishPostHandlerSpec extends ObjectBehavior
 
         $eventStore->events($id)->willReturn(
             [
-                new PostWasCreated($id, 'Title', 'Content')
+                new PostWasCreated($id, self::POST_TITLE, self::POST_SLUG, self::POST_CONTENT)
             ]
         );
 
