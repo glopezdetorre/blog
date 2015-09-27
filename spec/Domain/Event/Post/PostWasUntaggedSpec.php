@@ -10,9 +10,11 @@ use Prophecy\Argument;
 
 class PostWasUntaggedSpec extends ObjectBehavior
 {
-    function let(PostId $postId, Tag $tag)
+    const TEST_TAG = 'My tag';
+
+    function let(PostId $postId)
     {
-        $this->beConstructedWith($postId, $tag);
+        $this->beConstructedWith($postId, self::TEST_TAG);
     }
 
     function it_is_initializable()
@@ -26,9 +28,9 @@ class PostWasUntaggedSpec extends ObjectBehavior
         $this->aggregateId()->shouldBeLike($postId);
     }
 
-    function it_allow_retrieving_tag(Tag $tag)
+    function it_allow_retrieving_tag()
     {
-        $this->tag()->shouldBeLike($tag);
+        $this->tagName()->shouldBeLike(self::TEST_TAG);
     }
 
     function it_should_allow_retrieving_message_name()

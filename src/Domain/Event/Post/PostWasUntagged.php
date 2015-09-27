@@ -14,18 +14,18 @@ class PostWasUntagged implements DomainEvent
     private $postId;
 
     /**
-     * @var Tag
+     * @var string
      */
-    private $tag;
+    private $tagName;
 
     /**
      * @param PostId $postId
-     * @param Tag $tag
+     * @param string $tagName
      */
-    public function __construct(PostId $postId, Tag $tag)
+    public function __construct(PostId $postId, $tagName)
     {
         $this->postId = $postId;
-        $this->tag = $tag;
+        $this->tagName = $tagName;
     }
 
     /**
@@ -37,11 +37,11 @@ class PostWasUntagged implements DomainEvent
     }
 
     /**
-     * @return Tag
+     * @return string
      */
-    public function tag()
+    public function tagName()
     {
-        return $this->tag;
+        return $this->tagName;
     }
 
     /**

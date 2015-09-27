@@ -5,6 +5,7 @@ namespace spec\Gorka\Blog\Infrastructure\Ui\Console;
 use Gorka\Blog\Domain\Command\Post\UntagPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Model\Post\Tag;
+use Gorka\Blog\Domain\Service\Slugifier;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -15,7 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PostUntagSpec extends ObjectBehavior
 {
     const TEST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
-    const TEST_TAG = 'My tag';
+    const TEST_TAG_NAME = 'My tag';
+    const TEST_TAG_SLUG = 'my-tag';
 
     function let(MessageBus $commandBus)
     {
@@ -33,8 +35,8 @@ class PostUntagSpec extends ObjectBehavior
         MessageBus $commandBus
     ) {
         $input->getArgument('id')->willReturn(self::TEST_ID);
-        $input->getArgument('tag')->willReturn(self::TEST_TAG);
-        $message = new UntagPost(PostId::create(self::TEST_ID), Tag::create(self::TEST_TAG));
+        $input->getArgument('tag')->willReturn(self::TEST_TAG_NAME);
+        $message = new UntagPost(PostId::create(self::TEST_ID), Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG));
         $commandBus->handle($message)->shouldBeCalled();
         $output->writeln(Argument::containingString('has been untagged'))->shouldBeCalled();
         $this->execute($input, $output);

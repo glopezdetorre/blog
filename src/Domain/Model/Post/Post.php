@@ -39,7 +39,7 @@ class Post extends EventRecorder
     {
         $this->id = $id;
         $this->published = false;
-        $this->tags = new ArrayCollection();
+        $this->tags = [];
     }
 
     public static function create(PostId $id, $title, $slug, $content)
@@ -87,24 +87,32 @@ class Post extends EventRecorder
         $this->recordThat(new PostWasUnpublished($this->id));
     }
 
+    /**
+     * @param Tag $tag
+     */
     public function addTag(Tag $tag)
     {
-        if (in_array($tag, $this->tags->getValues())) {
+        if (in_array($tag->name(), $this->tags)) {
             return;
         }
 
-        $this->tags->add($tag);
+        $this->tags[] = $tag->name();
         $this->recordThat(new PostWasTagged($this->id, $tag));
     }
 
-    public function removeTag(Tag $tag)
+    /**
+     * @param string $tagName
+     */
+    public function removeTag($tagName)
     {
-        if (!in_array($tag, $this->tags->getValues())) {
+        Assertion::string($tagName);
+        $key = array_search($tagName, $this->tags);
+        if (false === $key) {
             return;
         }
 
-        $this->tags->removeElement($tag);
-        $this->recordThat(new PostWasUntagged($this->id, $tag));
+        unset($this->tags[$key]);
+        $this->recordThat(new PostWasUntagged($this->id, $tagName));
     }
 
     public static function reconstituteFromEvents(AggregateHistory $aggregateHistory)
@@ -137,12 +145,15 @@ class Post extends EventRecorder
 
     private function applyPostWasTagged(PostWasTagged $event)
     {
-        $this->tags->add($event->tag());
+        $this->tags[] = $event->tag()->name();
     }
 
     private function applyPostWasUntagged(PostWasUntagged $event)
     {
-        $this->tags->removeElement($event->tag());
+        $key = array_search($event->tagName(), $this->tags, true);
+        if (false !== $key) {
+            unset($this->tags[$key]);
+        }
     }
 
     /**
