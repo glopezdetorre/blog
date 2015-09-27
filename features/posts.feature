@@ -5,36 +5,41 @@ Feature: Posts
 
   Scenario Outline: Creating a new post with valid data
     Given No post exists with id <id>
-    When I call create post with id <id>, title <title> and content <content>
+    When I call create post with id <id>, title <title>, slug <slug> and content <content>
     Then I should see a PostWasCreated event with id <id>, title <title> and content <content>
 
     Examples:
-      | id                                      | title              | content              |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "My title"         | "My content"         |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "My <b>title</b>"  | "My <b>content</b>"  |
+      | id                                      | title              | slug         | content              |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "My title"         | "my-title"   |"My content"         |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a"  | "My <b>title</b>"  | "my-title"   | "My <b>content</b>"  |
 
 
   Scenario Outline: Creating a new post with invalid data
     Given No post exists with id <id>
-    When I call create post with id <id>, title <title> and content <content>
+    When I call create post with id <id>, title <title>, slug <slug> and content <content>
     Then I should see an Exception
      And No new events should have been recorded
 
     Examples:
-      | id                                     | title       | content        |
-      | 1234                                   | ""          | "My content"   |
-      | ""                                     | "My title"  | "My content"   |
-      | "  "                                   | "My title"  | "My content"   |
-      | "\n"                                   | "My title"  | "My content"   |
-      | null                                   | "My title"  | "My content"   |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | ""          | "My content"   |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | " "         | "My content"   |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "\n"        | "My content"   |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | null        | "My content"   |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | ""             |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | " "            |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "\n"           |
-      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | null           |
+      | id                                     | title       | slug       | content        |
+      | 1234                                   | ""          | "my-title" | "My content"   |
+      | ""                                     | "My title"  | "my-title" | "My content"   |
+      | "  "                                   | "My title"  | "my-title" | "My content"   |
+      | "\n"                                   | "My title"  | "my-title" | "My content"   |
+      | null                                   | "My title"  | "my-title" | "My content"   |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | ""          | "my-title" | "My content"   |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | " "         | "my-title" | "My content"   |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "\n"        | "my-title" | "My content"   |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | null        | "my-title" | "My content"   |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "my-title" | ""             |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "my-title" | " "            |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "my-title" | "\n"           |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "my-title" | null           |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | ""         | null           |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | null       | null           |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "-_"       | null           |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "  "       | null           |
+      | "25769c6c-d34d-4bfe-ba98-e0ee856f3e7a" | "My title"  | "\n"       | null           |
 
 
   Scenario Outline: Changing post title with valid title

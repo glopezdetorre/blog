@@ -20,9 +20,10 @@ use Prophecy\Argument;
 
 class PostSpec extends ObjectBehavior
 {
-    const TEST_CONTENT = 'My content';
-    const TEST_TITLE = 'My title';
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
+    const TEST_TITLE = 'My title';
+    const TEST_SLUG = 'my-title';
+    const TEST_CONTENT = 'My content';
 
     function let()
     {
@@ -30,6 +31,7 @@ class PostSpec extends ObjectBehavior
             'create', [
                 PostId::create(self::POST_ID),
                 self::TEST_TITLE,
+                self::TEST_SLUG,
                 self::TEST_CONTENT
             ]
         );
@@ -71,7 +73,7 @@ class PostSpec extends ObjectBehavior
         foreach ($badTitles as $badTitle) {
             $this
                 ->shouldThrow(\InvalidArgumentException::class)
-                ->during('create', [PostId::create(self::POST_ID), $badTitle, self::TEST_CONTENT]);
+                ->during('create', [PostId::create(self::POST_ID), $badTitle, self::TEST_SLUG, self::TEST_CONTENT]);
         }
 
         foreach ($badTitles as $badTitle) {
@@ -107,11 +109,33 @@ class PostSpec extends ObjectBehavior
         foreach ($badContents as $badContent) {
             $this
                 ->shouldThrow(\InvalidArgumentException::class)
-                ->during('create', [PostId::create(self::POST_ID), self::TEST_TITLE, $badContent]);
+                ->during('create', [PostId::create(self::POST_ID), self::TEST_TITLE, self::TEST_SLUG, $badContent]);
         }
 
         foreach ($badContents as $badContent) {
             $this->shouldThrow(\InvalidArgumentException::class)->during('changeContent', [$badContent]);
+        }
+    }
+
+    function it_should_not_allow_non_string_or_empty_slugs()
+    {
+        $badSlugs = [
+            null,
+            new \StdClass(),
+            true,
+            123,
+            '',
+            '   ',
+            "\t",
+            "\n",
+            "\t  \n",
+            "-_--"
+        ];
+
+        foreach ($badSlugs as $badSlug) {
+            $this
+                ->shouldThrow(\InvalidArgumentException::class)
+                ->during('create', [PostId::create(self::POST_ID), self::TEST_TITLE, $badSlug, self::TEST_CONTENT]);
         }
     }
 
@@ -194,7 +218,7 @@ class PostSpec extends ObjectBehavior
         $aggregateHistory = new AggregateHistory(
             $id,
             [
-                new PostWasCreated($id, self::TEST_TITLE, self::TEST_CONTENT),
+                new PostWasCreated($id, self::TEST_TITLE, self::TEST_SLUG, self::TEST_CONTENT),
                 new PostWasPublished($id)
             ]
         );

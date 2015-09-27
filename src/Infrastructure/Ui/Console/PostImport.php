@@ -74,7 +74,7 @@ class PostImport extends Command
             $content = file_get_contents($fileName);
             $title = $this->questionHelper->ask($input, $output, new Question('Please enter title for this post: '));
 
-            $this->commandBus->handle(new CreatePost($id, $title, $content));
+            $this->commandBus->handle(new CreatePost($id, $title, null, $content));
 
             // This might not be true: we have put the command on the bus,
             // there is no guarantee is has been accomplished

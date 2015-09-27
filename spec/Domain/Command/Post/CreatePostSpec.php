@@ -9,7 +9,8 @@ use Prophecy\Argument;
 
 class CreatePostSpec extends ObjectBehavior
 {
-    const POST_TITLE = 'Title';
+    const POST_TITLE = 'My title';
+    const POST_SLUG = 'my-title';
     const POST_CONTENT = 'Post content';
 
     function let(PostId $postId)
@@ -17,6 +18,7 @@ class CreatePostSpec extends ObjectBehavior
         $this->beConstructedWith(
             $postId,
             self::POST_TITLE,
+            self::POST_SLUG,
             self::POST_CONTENT
         );
     }
@@ -34,6 +36,11 @@ class CreatePostSpec extends ObjectBehavior
     function it_should_allow_retrieving_post_title()
     {
         $this->postTitle()->shouldBe(self::POST_TITLE);
+    }
+
+    function it_should_allow_retrieving_post_slug()
+    {
+        $this->postSlug()->shouldBe(self::POST_SLUG);
     }
 
     function it_should_allow_retrieving_post_content()

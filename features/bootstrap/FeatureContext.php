@@ -89,12 +89,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @When I call create post with id :id, title :title and content :content
+     * @When I call create post with id :id, title :title, slug :slug and content :content
      */
-    public function ICallCreatePostWithIdTitleAndContent($id, $title, $content)
+    public function ICallCreatePostWithIdTitleSlugAndContent($id, $title, $slug, $content)
     {
         try {
-            $this->post = Post::create(PostId::create($id), $title, $content);
+            $this->post = Post::create(PostId::create($id), $title, $slug, $content);
         } catch (\Exception $e) {
             $this->exception = $e;
         }
@@ -122,7 +122,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function APostWithIdExistsWithTitleAndContent($id, $title, $content)
     {
         $postId = PostId::create($id);
-        $this->events[] = new PostWasCreated($postId, $title, $content);
+        $this->events[] = new PostWasCreated($postId, $title, null, $content);
         $this->post = Post::reconstituteFromEvents(new AggregateHistory($postId, $this->events));
     }
 
