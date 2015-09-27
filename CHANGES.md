@@ -3,6 +3,9 @@
 ## 2015/09/27
 
 - Post titles can now be slugified
+- Tags are now sluggified
+- Removed Doctrine/Collections dependency
+- Fixed some minor issues
 
 ## 2015/09/26
 
