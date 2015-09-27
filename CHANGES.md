@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/09/27
+
+- Post titles can now be slugified
+
 ## 2015/09/26
 
 - Added post tagging support
