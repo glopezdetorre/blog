@@ -4,7 +4,9 @@
 require __DIR__.'/../vendor/autoload.php';
 
 use Gorka\Blog\Domain\Command\Post\TagPost;
+use Gorka\Blog\Domain\Command\Post\TagPostHandler;
 use Gorka\Blog\Domain\Command\Post\UntagPost;
+use Gorka\Blog\Domain\Command\Post\UntagPostHandler;
 use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
 use Pimple\Container;
@@ -125,7 +127,7 @@ $container['UnpublishPostHandler'] = function($container) {
     return new UnpublishPostHandler($container['EventStore'], $container['EventBus']);
 };
 $container['TagPostHandler'] = function($container) {
-    return new TagPostHandler($container['EventStore'], $container['EventBus']);
+    return new TagPostHandler($container['EventStore'], $container['EventBus'], $container['Slugifier']);
 };
 $container['UntagPostHandler'] = function($container) {
     return new UntagPostHandler($container['EventStore'], $container['EventBus']);

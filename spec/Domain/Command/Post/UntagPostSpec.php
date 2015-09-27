@@ -32,4 +32,9 @@ class UntagPostSpec extends ObjectBehavior
     {
         $this->tagName()->shouldBeLike(self::TEST_TAG);
     }
+
+    function it_should_allow_retrieving_message_name()
+    {
+        $this->messageName()->shouldBe('blog:untag_post');
+    }
 }
