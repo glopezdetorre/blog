@@ -2,10 +2,10 @@
 
 namespace Gorka\Blog\Domain\Command\Post;
 
+use Gorka\Blog\Domain\Command\DomainCommand;
 use Gorka\Blog\Domain\Model\Post\PostId;
-use Gorka\Blog\Domain\Model\Post\Tag;
 
-class TagPost
+class TagPost implements DomainCommand
 {
     /**
      * @var PostId
@@ -13,14 +13,14 @@ class TagPost
     private $postId;
 
     /**
-     * @var Tag
+     * @var string
      */
-    private $tag;
+    private $tagName;
 
-    public function __construct(PostId $postId, Tag $tag)
+    public function __construct(PostId $postId, $tagName)
     {
         $this->postId = $postId;
-        $this->tag = $tag;
+        $this->tagName = $tagName;
     }
 
     public function postId()
@@ -28,13 +28,18 @@ class TagPost
         return $this->postId;
     }
 
-    public function tag()
+    public function tagName()
     {
-        return $this->tag;
+        return $this->tagName;
     }
 
     public function aggregateId()
     {
         return $this->postId;
+    }
+
+    public function messageName()
+    {
+        return 'blog:tag_post';
     }
 }

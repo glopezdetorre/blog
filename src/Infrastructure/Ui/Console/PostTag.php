@@ -5,6 +5,7 @@ namespace Gorka\Blog\Infrastructure\Ui\Console;
 use Gorka\Blog\Domain\Command\Post\TagPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Model\Post\Tag;
+use Gorka\Blog\Domain\Service\Slugifier;
 use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -46,9 +47,8 @@ class PostTag extends Command
     {
         try {
             $id = PostId::create($input->getArgument('id'));
-            $tag = Tag::create($input->getArgument('tag'));
+            $tag = $input->getArgument('tag');
             $this->commandBus->handle(new TagPost($id, $tag));
-
             $output->writeln(sprintf('<info>Post with id %s has been tagged with \'%s\'</info>', $id, $tag));
         } catch (\Exception $e) {
             $output->writeln('<error>Unable to tag post:</error> '.$e->getMessage());

@@ -25,6 +25,9 @@ class PostSpec extends ObjectBehavior
     const TEST_SLUG = 'my-title';
     const TEST_CONTENT = 'My content';
 
+    const TEST_TAG_NAME = 'My tag';
+    const TEST_TAG_SLUG = 'my-tag';
+
     function let()
     {
         $this->beConstructedThrough(
@@ -169,40 +172,44 @@ class PostSpec extends ObjectBehavior
         $this->recordedEvents()->shouldNotContainEvent($unexpectedEvent);
     }
 
-    function it_should_record_tagging_with_new_tags(Tag $tag)
+    function it_should_record_tagging_with_new_tags()
     {
+        $tag = Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG);
         $this->addTag($tag);
         $this->recordedEvents()->shouldContainEvent(
-            new PostWasTagged(PostId::create(self::POST_ID), $tag->getWrappedObject())
+            new PostWasTagged(PostId::create(self::POST_ID), $tag)
         );
     }
 
-    function it_should_not_record_tagging_of_existing_tags(Tag $tag)
+    function it_should_not_record_tagging_of_existing_tags()
     {
+        $tag = Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG);
         $this->addTag($tag);
         $this->addTag($tag);
         $this->recordedEvents()->shouldContainEventTimes(
-            new PostWasTagged(PostId::create(self::POST_ID), $tag->getWrappedObject()),
+            new PostWasTagged(PostId::create(self::POST_ID), $tag),
             1
         );
     }
 
-    function it_should_record_untagging_of_existing_tags(Tag $tag)
+    function it_should_record_untagging_of_existing_tags()
     {
+        $tag = Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG);
         $this->addTag($tag);
-        $this->removeTag($tag);
+        $this->removeTag($tag->name());
         $this->recordedEvents()->shouldContainEvent(
-            new PostWasUntagged(PostId::create(self::POST_ID), $tag->getWrappedObject())
+            new PostWasUntagged(PostId::create(self::POST_ID), $tag->name())
         );
     }
 
     function it_should_not_record_untagging_of_unexisting_tags(Tag $tag)
     {
+        $tag = Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG);
         $this->addTag($tag);
-        $this->removeTag($tag);
-        $this->removeTag($tag);
+        $this->removeTag($tag->name());
+        $this->removeTag($tag->name());
         $this->recordedEvents()->shouldContainEventTimes(
-            new PostWasUntagged(PostId::create(self::POST_ID), $tag->getWrappedObject()),
+            new PostWasUntagged(PostId::create(self::POST_ID), $tag->name()),
             1
         );
     }
