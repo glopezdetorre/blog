@@ -5,6 +5,7 @@ namespace Gorka\Blog\Infrastructure\Ui\Console;
 use Gorka\Blog\Domain\Command\Post\UntagPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Model\Post\Tag;
+use Gorka\Blog\Domain\Service\Slugifier;
 use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,12 +20,19 @@ class PostUntag extends Command
     private $commandBus;
 
     /**
-     * @param MessageBus $commandBus
+     * @var Slugifier
      */
-    public function __construct(MessageBus $commandBus)
+    private $slugifier;
+
+    /**
+     * @param MessageBus $commandBus
+     * @param Slugifier $slugifier
+     */
+    public function __construct(MessageBus $commandBus, Slugifier $slugifier)
     {
         parent::__construct();
         $this->commandBus = $commandBus;
+        $this->slugifier = $slugifier;
     }
 
     protected function configure()
@@ -46,11 +54,8 @@ class PostUntag extends Command
     {
         try {
             $id = PostId::create($input->getArgument('id'));
-            $tag = Tag::create($input->getArgument('tag'));
+            $tag = $input->getArgument('tag');
             $this->commandBus->handle(new UntagPost($id, $tag));
-
-            // This might not be true: we have put the command on the bus,
-            // there is no guarantee is has been accomplished
             $output->writeln(sprintf('<info>Post with id %s has been untagged \'%s\'</info>', $id, $tag));
         } catch (\Exception $e) {
             $output->writeln('<error>Unable to untag post:</error> '.$e->getMessage());

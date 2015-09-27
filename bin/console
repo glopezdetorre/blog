@@ -3,6 +3,8 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Gorka\Blog\Domain\Command\Post\TagPost;
+use Gorka\Blog\Domain\Command\Post\UntagPost;
 use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
 use Pimple\Container;
@@ -31,6 +33,10 @@ use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
 use Symfony\Component\Console\Application;
 
 $container = new Container();
+
+$container['Slugifier'] = function() {
+    return new \Gorka\Blog\Infrastructure\Service\Slugifier(new \Cocur\Slugify\Slugify());
+};
 
 $container['QuestionHelper'] = function() {
     return new \Symfony\Component\Console\Helper\QuestionHelper();
@@ -90,7 +96,9 @@ $container['CommandBus'] = function ($container) {
         [
             CreatePost::class => ['CreatePostHandler', 'handle'],
             PublishPost::class => ['PublishPostHandler', 'handle'],
-            UnpublishPost::class => ['UnpublishPostHandler', 'handle']
+            UnpublishPost::class => ['UnpublishPostHandler', 'handle'],
+            TagPost::class => ['TagPostHandler', 'handle'],
+            UntagPost::class => ['UntagPostHandler', 'handle']
         ],
         new ServiceLocatorAwareCallableResolver($serviceLocator)
     );
@@ -108,13 +116,19 @@ $container['CommandBus'] = function ($container) {
 };
 
 $container['CreatePostHandler'] = function($container) {
-    return new CreatePostHandler($container['EventStore'], $container['EventBus']);
+    return new CreatePostHandler($container['EventStore'], $container['EventBus'], $container['Slugifier']);
 };
 $container['PublishPostHandler'] = function($container) {
     return new PublishPostHandler($container['EventStore'], $container['EventBus']);
 };
 $container['UnpublishPostHandler'] = function($container) {
     return new UnpublishPostHandler($container['EventStore'], $container['EventBus']);
+};
+$container['TagPostHandler'] = function($container) {
+    return new TagPostHandler($container['EventStore'], $container['EventBus']);
+};
+$container['UntagPostHandler'] = function($container) {
+    return new UntagPostHandler($container['EventStore'], $container['EventBus']);
 };
 
 $application = new Application();

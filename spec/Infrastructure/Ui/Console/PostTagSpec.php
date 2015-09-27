@@ -5,6 +5,7 @@ namespace spec\Gorka\Blog\Infrastructure\Ui\Console;
 use Gorka\Blog\Domain\Command\Post\TagPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Model\Post\Tag;
+use Gorka\Blog\Domain\Service\Slugifier;
 use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PostTagSpec extends ObjectBehavior
 {
     const TEST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
-    const TEST_TAG = 'My tag';
+    const TEST_TAG_NAME = 'My tag';
+    const TEST_TAG_SLUG = 'my-tag';
 
-    function let(MessageBus $commandBus)
+    function let(MessageBus $commandBus, Slugifier $slugifier)
     {
-        $this->beConstructedWith($commandBus);
+        $this->beConstructedWith($commandBus, $slugifier);
     }
 
     function it_is_initializable()
@@ -30,11 +32,13 @@ class PostTagSpec extends ObjectBehavior
     function it_should_put_publish_command_on_the_bus(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus
+        MessageBus $commandBus,
+        Slugifier $slugifier
     ) {
         $input->getArgument('id')->willReturn(self::TEST_ID);
-        $input->getArgument('tag')->willReturn(self::TEST_TAG);
-        $message = new TagPost(PostId::create(self::TEST_ID), Tag::create(self::TEST_TAG));
+        $input->getArgument('tag')->willReturn(self::TEST_TAG_NAME);
+        $slugifier->slugify(self::TEST_TAG_NAME)->willReturn(self::TEST_TAG_SLUG);
+        $message = new TagPost(PostId::create(self::TEST_ID), Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG));
         $commandBus->handle($message)->shouldBeCalled();
         $output->writeln(Argument::containingString('has been tagged'))->shouldBeCalled();
         $this->execute($input, $output);

@@ -12,20 +12,28 @@ class Tag
     private $name;
 
     /**
-     * @param string $name
+     * @var string
      */
-    private function __construct($name)
+    private $slug;
+
+    /**
+     * @param string $name
+     * @param string $slug
+     */
+    private function __construct($name, $slug)
     {
         $this->setName($name);
+        $this->setSlug($slug);
     }
 
     /**
      * @param string $name
+     * @param string $slug
      * @return static
      */
-    public static function create($name)
+    public static function create($name, $slug)
     {
-        return new static($name);
+        return new static($name, $slug);
     }
 
     /**
@@ -49,8 +57,24 @@ class Tag
      */
     private function setName($name)
     {
-        Assertion::string($name);
-        Assertion::notBlank(trim($name));
+        Assertion::string($name, 'Tag name should be a string');
+        Assertion::notBlank(trim($name), 'Tag name cannot be blank');
         $this->name = $name;
+    }
+
+    public function slug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param $slug
+     */
+    private function setSlug($slug)
+    {
+        Assertion::string($slug, 'Slug should be a string');
+        Assertion::notBlank(trim($slug), 'Slug cannot be blank');
+        Assertion::false(preg_replace('/[a-z0-9]/i', '', $slug) == $slug, 'Slug should have content');
+        $this->slug = $slug;
     }
 }

@@ -21,6 +21,7 @@ use Gorka\Blog\Domain\Model\Post\Tag;
  */
 class FeatureContext implements Context, SnippetAcceptingContext
 {
+    const TEST_TAG_SLUG = 'test-tag-slug';
     /**
      * @var Post
      */
@@ -272,7 +273,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function postIsNotTaggedWith($tag)
     {
-        $this->events[] = new \Gorka\Blog\Domain\Event\Post\PostWasUntagged($this->post->id(), Tag::create($tag));
+        $this->events[] = new PostWasUntagged($this->post->id(), $tag);
         $this->post = Post::reconstituteFromEvents(new AggregateHistory($this->post->id(), $this->events));
     }
 
@@ -281,7 +282,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iCallAddtagWith($tag)
     {
-        $this->post->addTag(Tag::create($tag));
+        $this->post->addTag(Tag::create($tag, self::TEST_TAG_SLUG));
     }
 
     /**
@@ -289,7 +290,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwastaggedEventWithIdAndTag($id, $tag)
     {
-        $tag = Tag::create($tag);
         $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasTagged::class);
         foreach ($events as $event) {
             if ($event->aggregateId() == $id && $event->tag() == $tag) return;
@@ -302,7 +302,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function postIsTaggedWith($tag)
     {
-        $this->events[] = new PostWasTagged($this->post->id(), Tag::create($tag));
+        $this->events[] = new PostWasTagged($this->post->id(), Tag::create($tag, self::TEST_TAG_SLUG));
         $this->post = Post::reconstituteFromEvents(new AggregateHistory($this->post->id(), $this->events));
     }
 
@@ -324,7 +324,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iCallRemovetagWith($tag)
     {
-        $this->post->removeTag(Tag::create($tag));
+        $this->post->removeTag($tag);
     }
 
     /**
@@ -332,10 +332,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldSeeAPostwasuntaggedEventWithIdAndTag($id, $tag)
     {
-        $tag = Tag::create($tag);
         $events = $this->filterByEventType($this->post?$this->post->recordedEvents():[], PostWasUntagged::class);
         foreach ($events as $event) {
-            if ($event->aggregateId() == $id && $event->tag() == $tag) return;
+            if ($event->aggregateId() == $id && $event->tagName() == $tag) return;
         }
         throw new \Exception("Expected PostWasUntagged event with id '{$id}' and tag '{$tag}' was not found");
     }
