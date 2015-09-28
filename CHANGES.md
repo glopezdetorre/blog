@@ -1,5 +1,9 @@
 # Changes
 
+## 2015/09/28
+
+- Testing apiary.io integration
+
 ## 2015/09/27
 
 - Post titles can now be sluggified
