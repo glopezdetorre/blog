@@ -1,0 +1,55 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# Blog
+
+Simple blog API
+
+## Version [/version]
+
+Current API version
+
+### Get resource [GET]
+
+ + Response 200 (text/plain)
+ 
+        0.0.0
+
+# Group Post resources
+Resources related to posts
+
+## Post [/posts]
+
++ Model (application/json)
+
+        ```js
+        {
+            "title": "Favourite programming language",
+            "slug": "favourite-programming-language",
+            "content": "# Favourite Programming Language\n## (PHP)[http://php.net]"
+            "published_at": "2015-08-05T08:40:51.620Z",
+            "tags": [
+                {
+                    "name": "Swift",
+                    "slug": "swift"
+                }, {
+                    "name": "Python",
+                    "slug": "python"
+                }, {
+                    "name": "Objective-C",
+                    "slug": "objective-c"
+                }, {
+                    "name": "Ruby",
+                    "slug": "ruby"
+                }
+            ]
+        }
+        ```
+        
+### List posts [GET]
+
++ Response 200
+
+    [Post][]
+
+    
