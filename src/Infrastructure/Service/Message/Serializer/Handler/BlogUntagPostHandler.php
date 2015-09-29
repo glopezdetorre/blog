@@ -22,7 +22,9 @@ class BlogUntagPostHandler implements DomainMessageHandler
 
         return [
             'id' => $message->postId()->id(),
-            'tag_name' => $message->tagName()
+            'tag' => [
+                'name' => $message->tagName()
+            ]
         ];
     }
 
@@ -32,10 +34,10 @@ class BlogUntagPostHandler implements DomainMessageHandler
      */
     public function deserialize(array $data)
     {
-        if (!is_array($data) || !isset($data['id'], $data['tag_name'])) {
+        if (!is_array($data) || !isset($data['id'], $data['tag'], $data['tag']['name'])) {
             throw new \LogicException();
         }
 
-        return new UntagPost(PostId::create($data['id']), $data['tag_name']);
+        return new UntagPost(PostId::create($data['id']), $data['tag']['name']);
     }
 }
