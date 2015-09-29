@@ -24,7 +24,9 @@ class BlogUntagPostHandlerSpec extends ObjectBehavior
         $message = new UntagPost(PostId::create(self::POST_ID), self::TEST_TAG);
         $serializedMessage = [
             'id' => self::POST_ID,
-            'tag_name' => self::TEST_TAG
+            'tag' => [
+                'name' => self::TEST_TAG
+            ]
         ];
 
         $this->serialize($message)->shouldBe($serializedMessage);
@@ -40,7 +42,9 @@ class BlogUntagPostHandlerSpec extends ObjectBehavior
         $message = new UntagPost(PostId::create(self::POST_ID), self::TEST_TAG);
         $serializedMessage = [
             'id' => self::POST_ID,
-            'tag_name' => self::TEST_TAG
+            'tag' => [
+                'name' => self::TEST_TAG
+            ]
         ];
 
         $this->deserialize($serializedMessage)->shouldBeLike($message);
