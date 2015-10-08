@@ -98,7 +98,7 @@
 
     <target name="test:phpunit" description="Run phpunit if available">
         <available file="vendor/bin/phpunit" type="file" property="phpunit.Exists" />
-        <available file="phpspec.yml" type="file" property="phpunitConfig.Exists" />
+        <available file="phpunit.xml" type="file" property="phpunitConfig.Exists" />
         <if>
             <and>
                 <isset property="phpunit.Exists" />
@@ -106,7 +106,7 @@
             </and>
             <then>
                 <exec command="vendor/bin/phpunit" checkreturn="true" passthru="true">
-                    <arg value="--config=phpunit.yml"></arg>
+                    <arg value="--config=phpunit.xml"></arg>
                 </exec>
             </then>
             <else>
