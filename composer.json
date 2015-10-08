@@ -30,7 +30,7 @@
         "beberlei/assert": "^2.3",
         "ramsey/uuid": "^2.8",
         "symfony/console": "^2.7",
-        "pimple/pimple": "^3.0",
+        "gorka/pimp": "^3.0",
         "simple-bus/message-bus": "^2.2",
         "cocur/slugify": "^1.3"
     },
