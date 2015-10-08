@@ -21,7 +21,9 @@ class BlogPostWasUntaggedHandler implements DomainMessageHandler
 
         return [
             'id' => ((string) $message->postId()),
-            'tag_name' => $message->tagName()
+            'tag' => [
+                'name' => $message->tagName()
+            ]
         ];
     }
 
@@ -31,13 +33,13 @@ class BlogPostWasUntaggedHandler implements DomainMessageHandler
      */
     public function deserialize(array $data)
     {
-        if (!is_array($data) || !isset($data['id'], $data['tag_name'])) {
+        if (!is_array($data) || !isset($data['id'], $data['tag'], $data['tag']['name'])) {
             throw new \LogicException();
         }
 
         return new PostWasUntagged(
             PostId::create($data['id']),
-            $data['tag_name']
+            $data['tag']['name']
         );
     }
 }

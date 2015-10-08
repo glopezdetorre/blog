@@ -9,7 +9,6 @@ use Gorka\Blog\Domain\Command\Post\UntagPost;
 use Gorka\Blog\Domain\Command\Post\UntagPostHandler;
 use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
-use Pimple\Container;
 use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
 use Gorka\Blog\Infrastructure\Service\UuidGenerator;
 use Gorka\Blog\Domain\Command\Post\PublishPostHandler;
@@ -33,110 +32,123 @@ use SimpleBus\Message\Name\ClassBasedNameResolver;
 use SimpleBus\Message\Subscriber\NotifiesMessageSubscribersMiddleware;
 use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
 use Symfony\Component\Console\Application;
+use Gorka\Pimp\Container;
 
-$container = new Container();
+$container = new Container([
+    'Slugifier' => function () {
+        return new \Gorka\Blog\Infrastructure\Service\Slugifier(new \Cocur\Slugify\Slugify());
+    },
+    'QuestionHelper' => function () {
+        return new \Symfony\Component\Console\Helper\QuestionHelper();
+    },
+    'IdGenerator' => function () {
+        return new UuidGenerator();
+    },
+    'SystemClock' => function () {
+        return new \Gorka\Blog\Infrastructure\Service\SystemClock();
+    },
+    'Wrapper' => function ($c) {
+        return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Wrapper($c->get('SystemClock'));
+    },
+    'Serializer' => function ($c) {
+        return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Serializer($c->get('Wrapper'));
+    },
+    'EventStore' => function ($c) {
+        $mongoClient = new MongoClient();
+        return new MongoEventStore($c->get('Serializer'), $mongoClient, 'blog', 'events');
+    },
+    'EventBus' => function ($c) {
+        $serviceLocator = function ($serviceName) use ($c) {
+            return $c->get($serviceName);
+        };
 
-$container['Slugifier'] = function() {
-    return new \Gorka\Blog\Infrastructure\Service\Slugifier(new \Cocur\Slugify\Slugify());
-};
+        $eventSubscriberCollection = new CallableCollection(
+            [
+                PostWasCreated::class => []
+            ],
+            new ServiceLocatorAwareCallableResolver($serviceLocator)
+        );
+        $eventSubscribersResolver = new NameBasedMessageSubscriberResolver(
+            new ClassBasedNameResolver(),
+            $eventSubscriberCollection
+        );
+        $eventBus = new MessageBusSupportingMiddleware(
+            [
+                new FinishesHandlingMessageBeforeHandlingNext(),
+                new NotifiesMessageSubscribersMiddleware(
+                    $eventSubscribersResolver
+                )
+            ]
+        );
+        return $eventBus;
+    },
+    'CommandBus' => function ($c) {
+        $serviceLocator = function ($serviceName) use ($c) {
+            return $c->get($serviceName);
+        };
+        $commandHandlerMap = new CallableMap(
+            [
+                CreatePost::class => ['CreatePostHandler', 'handle'],
+                PublishPost::class => ['PublishPostHandler', 'handle'],
+                UnpublishPost::class => ['UnpublishPostHandler', 'handle'],
+                TagPost::class => ['TagPostHandler', 'handle'],
+                UntagPost::class => ['UntagPostHandler', 'handle']
+            ],
+            new ServiceLocatorAwareCallableResolver($serviceLocator)
+        );
+        $commandHandlerResolver = new NameBasedMessageHandlerResolver(
+            new ClassBasedNameResolver(),
+            $commandHandlerMap
+        );
+        $commandBus = new MessageBusSupportingMiddleware(
+            [
+                new FinishesHandlingMessageBeforeHandlingNext(),
+                new DelegatesToMessageHandlerMiddleware($commandHandlerResolver)
+            ]
+        );
+        return $commandBus;
+    }
+]);
 
-$container['QuestionHelper'] = function() {
-    return new \Symfony\Component\Console\Helper\QuestionHelper();
-};
+$container->add(
+    'CreatePostHandler',
+    function($c) {
+        return new CreatePostHandler($c->get('EventStore'), $c->get('EventBus'), $c->get('Slugifier'));
+    }
+);
 
-$container['IdGenerator'] = function() {
-    return new UuidGenerator();
-};
+$container->add(
+    'PublishPostHandler',
+    function ($c) {
+        return new PublishPostHandler($c->get('EventStore'), $c->get('EventBus'));
+    }
+);
 
-$container['SystemClock'] = function() {
-    return new \Gorka\Blog\Infrastructure\Service\SystemClock();
-};
+$container->add(
+    'UnpublishPostHandler',
+    function ($c) {
+        return new UnpublishPostHandler($c->get('EventStore'), $c->get('EventBus'));
+    }
+);
 
-$container['Wrapper'] = function($container) {
-    return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Wrapper($container['SystemClock']);
-};
+$container->add(
+    'TagPostHandler',
+    function ($c) {
+        return new TagPostHandler($c->get('EventStore'), $c->get('EventBus'), $c->get('Slugifier'));
+    }
+);
 
-$container['Serializer'] = function ($container) {
-    return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Serializer($container['Wrapper']);
-};
-
-$container['EventStore'] = function ($container) {
-    $mongoClient = new MongoClient();
-    return new MongoEventStore($container['Serializer'], $mongoClient, 'blog', 'events');
-};
-
-$container['EventBus'] = function ($container) {
-    $serviceLocator = function ($serviceName) use ($container) {
-        return $container[$serviceName];
-    };
-    $eventSubscriberCollection = new CallableCollection(
-        [
-            PostWasCreated::class => []
-        ],
-        new ServiceLocatorAwareCallableResolver($serviceLocator)
-    );
-    $eventSubscribersResolver = new NameBasedMessageSubscriberResolver(
-        new ClassBasedNameResolver(),
-        $eventSubscriberCollection
-    );
-    $eventBus = new MessageBusSupportingMiddleware(
-        [
-            new FinishesHandlingMessageBeforeHandlingNext(),
-            new NotifiesMessageSubscribersMiddleware(
-                $eventSubscribersResolver
-            )
-        ]
-    );
-    return $eventBus;
-};
-
-$container['CommandBus'] = function ($container) {
-    $serviceLocator = function ($serviceName) use ($container) {
-        return $container[$serviceName];
-    };
-    $commandHandlerMap = new CallableMap(
-        [
-            CreatePost::class => ['CreatePostHandler', 'handle'],
-            PublishPost::class => ['PublishPostHandler', 'handle'],
-            UnpublishPost::class => ['UnpublishPostHandler', 'handle'],
-            TagPost::class => ['TagPostHandler', 'handle'],
-            UntagPost::class => ['UntagPostHandler', 'handle']
-        ],
-        new ServiceLocatorAwareCallableResolver($serviceLocator)
-    );
-    $commandHandlerResolver = new NameBasedMessageHandlerResolver(
-        new ClassBasedNameResolver(),
-        $commandHandlerMap
-    );
-    $commandBus = new MessageBusSupportingMiddleware(
-        [
-            new FinishesHandlingMessageBeforeHandlingNext(),
-            new DelegatesToMessageHandlerMiddleware($commandHandlerResolver)
-        ]
-    );
-    return $commandBus;
-};
-
-$container['CreatePostHandler'] = function($container) {
-    return new CreatePostHandler($container['EventStore'], $container['EventBus'], $container['Slugifier']);
-};
-$container['PublishPostHandler'] = function($container) {
-    return new PublishPostHandler($container['EventStore'], $container['EventBus']);
-};
-$container['UnpublishPostHandler'] = function($container) {
-    return new UnpublishPostHandler($container['EventStore'], $container['EventBus']);
-};
-$container['TagPostHandler'] = function($container) {
-    return new TagPostHandler($container['EventStore'], $container['EventBus'], $container['Slugifier']);
-};
-$container['UntagPostHandler'] = function($container) {
-    return new UntagPostHandler($container['EventStore'], $container['EventBus']);
-};
+$container->add(
+    'UntagPostHandler',
+    function ($c) {
+        return new UntagPostHandler($c->get('EventStore'), $c->get('EventBus'));
+    }
+);
 
 $application = new Application();
-$application->add(new PostImport($container['CommandBus'], $container['IdGenerator'], $container['QuestionHelper']));
-$application->add(new PostPublish($container['CommandBus']));
-$application->add(new PostUnpublish($container['CommandBus']));
-$application->add(new PostTag($container['CommandBus']));
-$application->add(new PostUntag($container['CommandBus']));
+$application->add(new PostImport($container->get('CommandBus'), $container->get('IdGenerator'), $container->get('QuestionHelper')));
+$application->add(new PostPublish($container->get('CommandBus')));
+$application->add(new PostUnpublish($container->get('CommandBus')));
+$application->add(new PostTag($container->get('CommandBus')));
+$application->add(new PostUntag($container->get('CommandBus')));
 $application->run();

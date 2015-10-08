@@ -1,5 +1,10 @@
 # Changes
 
+## 2015/10/08 - v0.7.2
+
+- Replaced Pimple DIC with Pimp
+- Fixed phpunit config in build file
+
 ## 2015/09/28
 
 - Testing apiary.io integration

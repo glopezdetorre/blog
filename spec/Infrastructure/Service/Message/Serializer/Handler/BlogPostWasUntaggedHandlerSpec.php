@@ -28,7 +28,9 @@ class BlogPostWasUntaggedHandlerSpec extends ObjectBehavior
 
         $serializedMessage = [
             'id' => self::POST_ID,
-            'tag_name' => self::TAG_NAME
+            'tag' => [
+                'name' => self::TAG_NAME
+            ]
         ];
 
         $this->serialize($message)->shouldBe($serializedMessage);
@@ -44,7 +46,9 @@ class BlogPostWasUntaggedHandlerSpec extends ObjectBehavior
         $message = new PostWasUntagged(PostId::create(self::POST_ID), self::TAG_NAME);
         $serializedMessage = [
             'id' => self::POST_ID,
-            'tag_name' => self::TAG_NAME
+            'tag' => [
+                'name' => self::TAG_NAME
+            ]
         ];
 
         $this->deserialize($serializedMessage)->shouldBeLike($message);
