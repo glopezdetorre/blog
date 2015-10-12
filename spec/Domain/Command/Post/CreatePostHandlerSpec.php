@@ -10,8 +10,8 @@ use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Service\Slugifier;
 use PhpSpec\ObjectBehavior;
+use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
-use SimpleBus\Message\Bus\MessageBus;
 
 class CreatePostHandlerSpec extends ObjectBehavior
 {
@@ -20,7 +20,7 @@ class CreatePostHandlerSpec extends ObjectBehavior
     const POST_CONTENT = 'Post content';
     const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';
 
-    function let(EventStore $eventStore, MessageBus $eventBus, Slugifier $slugifier)
+    function let(EventStore $eventStore, EventBus $eventBus, Slugifier $slugifier)
     {
         $this->beConstructedWith($eventStore, $eventBus, $slugifier);
     }
@@ -30,7 +30,7 @@ class CreatePostHandlerSpec extends ObjectBehavior
         $this->shouldHaveType(CreatePostHandler::class);
     }
 
-    function it_should_commit_create_post_events(EventStore $eventStore, MessageBus $eventBus, CreatePost $command)
+    function it_should_commit_create_post_events(EventStore $eventStore, EventBus $eventBus, CreatePost $command)
     {
         $id = PostId::create(self::POST_ID);
         $command->postId()->willReturn($id);
@@ -49,7 +49,7 @@ class CreatePostHandlerSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         foreach ($expectedEvents as $expectedEvent) {
-            $eventBus->handle($expectedEvent)->shouldBeCalled();
+            $eventBus->dispatch($expectedEvent)->shouldBeCalled();
         }
 
         $this->handle($command);
@@ -57,7 +57,7 @@ class CreatePostHandlerSpec extends ObjectBehavior
 
     function it_should_generate_slugs_if_empty(
         EventStore $eventStore,
-        MessageBus $eventBus,
+        EventBus $eventBus,
         CreatePost $command,
         Slugifier $slugifier
     ) {
@@ -80,7 +80,7 @@ class CreatePostHandlerSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         foreach ($expectedEvents as $expectedEvent) {
-            $eventBus->handle($expectedEvent)->shouldBeCalled();
+            $eventBus->dispatch($expectedEvent)->shouldBeCalled();
         }
 
         $this->handle($command);

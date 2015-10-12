@@ -12,8 +12,8 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Model\Post\Tag;
 use Gorka\Blog\Domain\Service\Slugifier;
 use PhpSpec\ObjectBehavior;
+use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
-use SimpleBus\Message\Bus\MessageBus;
 
 class TagPostHandlerSpec extends ObjectBehavior
 {
@@ -24,7 +24,7 @@ class TagPostHandlerSpec extends ObjectBehavior
     const TEST_TAG_NAME = 'My tag';
     const TEST_TAG_SLUG = 'my-tag';
 
-    function let(EventStore $eventStore, MessageBus $eventBus, Slugifier $slugifier)
+    function let(EventStore $eventStore, EventBus $eventBus, Slugifier $slugifier)
     {
         $slugifier->slugify(self::TEST_TAG_NAME)->willReturn(self::TEST_TAG_SLUG);
         $this->beConstructedWith($eventStore, $eventBus, $slugifier);
@@ -35,7 +35,7 @@ class TagPostHandlerSpec extends ObjectBehavior
         $this->shouldHaveType(TagPostHandler::class);
     }
 
-    function it_should_commit_tag_post_events(EventStore $eventStore, MessageBus $eventBus, TagPost $command)
+    function it_should_commit_tag_post_events(EventStore $eventStore, EventBus $eventBus, TagPost $command)
     {
         $id = PostId::create(self::POST_ID);
         $tag = Tag::create(self::TEST_TAG_NAME, self::TEST_TAG_SLUG);
@@ -59,7 +59,7 @@ class TagPostHandlerSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         foreach ($expectedEvents as $expectedEvent) {
-            $eventBus->handle($expectedEvent)->shouldBeCalled();
+            $eventBus->dispatch($expectedEvent)->shouldBeCalled();
         }
 
         $this->handle($command);

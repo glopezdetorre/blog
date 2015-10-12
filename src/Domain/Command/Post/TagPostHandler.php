@@ -2,13 +2,12 @@
 
 namespace Gorka\Blog\Domain\Command\Post;
 
-use Gorka\Blog\Domain\Event\DomainEvent;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Model\Post\Tag;
 use Gorka\Blog\Domain\Service\Slugifier;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\EventBus;
 
 class TagPostHandler
 {
@@ -17,7 +16,7 @@ class TagPostHandler
      */
     private $eventStore;
     /**
-     * @var MessageBus
+     * @var EventBus
      */
     private $eventBus;
     /**
@@ -25,7 +24,7 @@ class TagPostHandler
      */
     private $slugifier;
 
-    public function __construct(EventStore $eventStore, MessageBus $eventBus, Slugifier $slugifier)
+    public function __construct(EventStore $eventStore, EventBus $eventBus, Slugifier $slugifier)
     {
         $this->eventStore = $eventStore;
         $this->eventBus = $eventBus;
@@ -40,7 +39,7 @@ class TagPostHandler
 
         $this->eventStore->commit(new AggregateHistory($post->id(), $post->recordedEvents()));
         foreach ($post->recordedEvents() as $event) {
-            $this->eventBus->handle($event);
+            $this->eventBus->dispatch($event);
         }
     }
 }

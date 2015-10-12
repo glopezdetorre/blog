@@ -4,7 +4,7 @@ namespace Gorka\Blog\Infrastructure\Ui\Console;
 
 use Gorka\Blog\Domain\Command\Post\UnpublishPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\CommandBus;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,14 +13,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PostUnpublish extends Command
 {
     /**
-     * @var MessageBus Message bus
+     * @var CommandBus Message bus
      */
     private $commandBus;
 
     /**
-     * @param MessageBus $commandBus
+     * @param CommandBus $commandBus
      */
-    public function __construct(MessageBus $commandBus)
+    public function __construct(CommandBus $commandBus)
     {
         parent::__construct();
         $this->commandBus = $commandBus;
@@ -44,7 +44,7 @@ class PostUnpublish extends Command
     {
         try {
             $id = PostId::create($input->getArgument('id'));
-            $this->commandBus->handle(new UnpublishPost($id));
+            $this->commandBus->dispatch(new UnpublishPost($id));
 
             // This might not be true: we have put the command on the bus,
             // there is no guarantee is has been accomplished
