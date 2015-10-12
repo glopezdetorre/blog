@@ -6,7 +6,7 @@ use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\Post;
 use Gorka\Blog\Domain\Service\Slugifier;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\EventBus;
 
 class CreatePostHandler
 {
@@ -16,7 +16,7 @@ class CreatePostHandler
     private $eventStore;
 
     /**
-     * @var MessageBus
+     * @var EventBus
      */
     private $eventBus;
 
@@ -27,10 +27,10 @@ class CreatePostHandler
 
     /**
      * @param EventStore $eventStore
-     * @param MessageBus $eventBus
+     * @param EventBus $eventBus
      * @param Slugifier $slugifier
      */
-    public function __construct(EventStore $eventStore, MessageBus $eventBus, Slugifier $slugifier)
+    public function __construct(EventStore $eventStore, EventBus $eventBus, Slugifier $slugifier)
     {
         $this->eventStore = $eventStore;
         $this->eventBus = $eventBus;
@@ -47,7 +47,7 @@ class CreatePostHandler
         $post = Post::create($command->postId(), $command->postTitle(), $slug, $command->postContent());
         $this->eventStore->commit(new AggregateHistory($post->id(), $post->recordedEvents()));
         foreach ($post->recordedEvents() as $event) {
-            $this->eventBus->handle($event);
+            $this->eventBus->dispatch($event);
         }
     }
 }

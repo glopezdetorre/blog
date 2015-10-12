@@ -12,8 +12,8 @@ use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Model\Post\Tag;
 use PhpSpec\ObjectBehavior;
+use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
-use SimpleBus\Message\Bus\MessageBus;
 
 class UntagPostHandlerSpec extends ObjectBehavior
 {
@@ -24,7 +24,7 @@ class UntagPostHandlerSpec extends ObjectBehavior
     const TEST_TAG_NAME = 'My tag';
     const TEST_TAG_SLUG = 'my-tag';
 
-    function let(EventStore $eventStore, MessageBus $eventBus)
+    function let(EventStore $eventStore, EventBus $eventBus)
     {
         $this->beConstructedWith($eventStore, $eventBus);
     }
@@ -34,7 +34,7 @@ class UntagPostHandlerSpec extends ObjectBehavior
         $this->shouldHaveType(UntagPostHandler::class);
     }
 
-    function it_should_commit_untag_post_events(EventStore $eventStore, MessageBus $eventBus, UntagPost $command)
+    function it_should_commit_untag_post_events(EventStore $eventStore, EventBus $eventBus, UntagPost $command)
     {
         $id = PostId::create(self::POST_ID);
         $command->postId()->willReturn($id);
@@ -58,7 +58,7 @@ class UntagPostHandlerSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         foreach ($expectedEvents as $expectedEvent) {
-            $eventBus->handle($expectedEvent)->shouldBeCalled();
+            $eventBus->dispatch($expectedEvent)->shouldBeCalled();
         }
 
         $this->handle($command);

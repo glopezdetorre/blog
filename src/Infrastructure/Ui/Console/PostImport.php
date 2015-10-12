@@ -5,7 +5,7 @@ namespace Gorka\Blog\Infrastructure\Ui\Console;
 use Gorka\Blog\Domain\Command\Post\CreatePost;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Service\IdGenerator;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\CommandBus;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,11 +31,11 @@ class PostImport extends Command
     private $questionHelper;
 
     /**
-     * @param MessageBus $commandBus
+     * @param CommandBus $commandBus
      * @param IdGenerator $userIdGenerator
      * @param QuestionHelper $questionHelper
      */
-    public function __construct(MessageBus $commandBus, IdGenerator $userIdGenerator, QuestionHelper $questionHelper)
+    public function __construct(CommandBus $commandBus, IdGenerator $userIdGenerator, QuestionHelper $questionHelper)
     {
         parent::__construct();
         $this->commandBus = $commandBus;
@@ -74,7 +74,7 @@ class PostImport extends Command
             $content = file_get_contents($fileName);
             $title = $this->questionHelper->ask($input, $output, new Question('Please enter title for this post: '));
 
-            $this->commandBus->handle(new CreatePost($id, $title, null, $content));
+            $this->commandBus->dispatch(new CreatePost($id, $title, null, $content));
 
             // This might not be true: we have put the command on the bus,
             // there is no guarantee is has been accomplished

@@ -2,12 +2,10 @@
 
 namespace Gorka\Blog\Domain\Command\Post;
 
-use Gorka\Blog\Domain\Command\DomainCommand;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\Post;
-use Gorka\Blog\Domain\Service\Slugifier;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\EventBus;
 
 class UntagPostHandler
 {
@@ -17,11 +15,11 @@ class UntagPostHandler
     private $eventStore;
 
     /**
-     * @var MessageBus
+     * @var EventBus
      */
     private $eventBus;
 
-    public function __construct(EventStore $eventStore, MessageBus $eventBus)
+    public function __construct(EventStore $eventStore, EventBus $eventBus)
     {
         $this->eventStore = $eventStore;
         $this->eventBus = $eventBus;
@@ -35,7 +33,7 @@ class UntagPostHandler
 
         $this->eventStore->commit(new AggregateHistory($post->id(), $post->recordedEvents()));
         foreach ($post->recordedEvents() as $event) {
-            $this->eventBus->handle($event);
+            $this->eventBus->dispatch($event);
         }
     }
 }

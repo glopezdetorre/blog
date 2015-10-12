@@ -10,8 +10,8 @@ use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
+use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
-use SimpleBus\Message\Bus\MessageBus;
 
 class PublishPostHandlerSpec extends ObjectBehavior
 {
@@ -23,7 +23,7 @@ class PublishPostHandlerSpec extends ObjectBehavior
 
     const POST_CONTENT = 'Content';
 
-    function let(EventStore $eventStore, MessageBus $eventBus)
+    function let(EventStore $eventStore, EventBus $eventBus)
     {
         $this->beConstructedWith($eventStore, $eventBus);
     }
@@ -33,7 +33,7 @@ class PublishPostHandlerSpec extends ObjectBehavior
         $this->shouldHaveType(PublishPostHandler::class);
     }
 
-    function it_should_commit_publish_post_events(EventStore $eventStore, MessageBus $eventBus, PublishPost $command)
+    function it_should_commit_publish_post_events(EventStore $eventStore, EventBus $eventBus, PublishPost $command)
     {
         $id = PostId::create(self::POST_ID);
         $command->postId()->willReturn($id);
@@ -55,7 +55,7 @@ class PublishPostHandlerSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         foreach ($expectedEvents as $expectedEvent) {
-            $eventBus->handle($expectedEvent)->shouldBeCalled();
+            $eventBus->dispatch($expectedEvent)->shouldBeCalled();
         }
 
         $this->handle($command);

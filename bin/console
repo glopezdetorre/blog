@@ -21,16 +21,6 @@ use Gorka\Blog\Domain\Command\Post\UnpublishPost;
 use Gorka\Blog\Domain\Command\Post\CreatePost;
 use Gorka\Blog\Domain\Command\Post\CreatePostHandler;
 use Gorka\Blog\Domain\Event\Post\PostWasCreated;
-use SimpleBus\Message\Bus\Middleware\FinishesHandlingMessageBeforeHandlingNext;
-use SimpleBus\Message\Bus\Middleware\MessageBusSupportingMiddleware;
-use SimpleBus\Message\CallableResolver\CallableCollection;
-use SimpleBus\Message\CallableResolver\CallableMap;
-use SimpleBus\Message\CallableResolver\ServiceLocatorAwareCallableResolver;
-use SimpleBus\Message\Handler\DelegatesToMessageHandlerMiddleware;
-use SimpleBus\Message\Handler\Resolver\NameBasedMessageHandlerResolver;
-use SimpleBus\Message\Name\ClassBasedNameResolver;
-use SimpleBus\Message\Subscriber\NotifiesMessageSubscribersMiddleware;
-use SimpleBus\Message\Subscriber\Resolver\NameBasedMessageSubscriberResolver;
 use Symfony\Component\Console\Application;
 use Gorka\Pimp\Container;
 
@@ -58,54 +48,67 @@ $container = new Container([
         return new MongoEventStore($c->get('Serializer'), $mongoClient, 'blog', 'events');
     },
     'EventBus' => function ($c) {
-        $serviceLocator = function ($serviceName) use ($c) {
-            return $c->get($serviceName);
-        };
 
-        $eventSubscriberCollection = new CallableCollection(
-            [
-                PostWasCreated::class => []
-            ],
-            new ServiceLocatorAwareCallableResolver($serviceLocator)
-        );
-        $eventSubscribersResolver = new NameBasedMessageSubscriberResolver(
-            new ClassBasedNameResolver(),
-            $eventSubscriberCollection
-        );
-        $eventBus = new MessageBusSupportingMiddleware(
-            [
-                new FinishesHandlingMessageBeforeHandlingNext(),
-                new NotifiesMessageSubscribersMiddleware(
-                    $eventSubscribersResolver
-                )
-            ]
-        );
+        $eventBus = new \Prooph\ServiceBus\EventBus();
+        $router = new \Prooph\ServiceBus\Plugin\Router\EventRouter();
+        $router
+            ->route(PostWasCreated::class)
+            ->to(
+                function (PostWasCreated $event) {
+
+                }
+            );
+        $eventBus->utilize($router);
+
         return $eventBus;
     },
     'CommandBus' => function ($c) {
-        $serviceLocator = function ($serviceName) use ($c) {
-            return $c->get($serviceName);
-        };
-        $commandHandlerMap = new CallableMap(
-            [
-                CreatePost::class => ['CreatePostHandler', 'handle'],
-                PublishPost::class => ['PublishPostHandler', 'handle'],
-                UnpublishPost::class => ['UnpublishPostHandler', 'handle'],
-                TagPost::class => ['TagPostHandler', 'handle'],
-                UntagPost::class => ['UntagPostHandler', 'handle']
-            ],
-            new ServiceLocatorAwareCallableResolver($serviceLocator)
-        );
-        $commandHandlerResolver = new NameBasedMessageHandlerResolver(
-            new ClassBasedNameResolver(),
-            $commandHandlerMap
-        );
-        $commandBus = new MessageBusSupportingMiddleware(
-            [
-                new FinishesHandlingMessageBeforeHandlingNext(),
-                new DelegatesToMessageHandlerMiddleware($commandHandlerResolver)
-            ]
-        );
+
+        $commandBus = new \Prooph\ServiceBus\CommandBus();
+        $router = new \Prooph\ServiceBus\Plugin\Router\CommandRouter();
+        $router
+            ->route(CreatePost::class)
+            ->to(
+                function (CreatePost $command) use ($c) {
+                    $handler = $c->get('CreatePostHandler');
+                    $handler->handle($command);
+                }
+            );
+        $router
+            ->route(PublishPost::class)
+            ->to(
+                function (PublishPost $command) use ($c) {
+                    $handler = $c->get('PublishPostHandler');
+                    $handler->handle($command);
+                }
+            );
+        $router
+            ->route(UnpublishPost::class)
+            ->to(
+                function (UnpublishPost $command) use ($c) {
+                    $handler = $c->get('UnpublishPostHandler');
+                    $handler->handle($command);
+                }
+            );
+        $router
+            ->route(TagPost::class)
+            ->to(
+                function (TagPost $command) use ($c) {
+                    $handler = $c->get('TagPostHandler');
+                    $handler->handle($command);
+                }
+            );
+        $router
+            ->route(UntagPost::class)
+            ->to(
+                function (UntagPost $command) use ($c) {
+                    $handler = $c->get('UntagPostHandler');
+                    $handler->handle($command);
+                }
+            );
+
+        $commandBus->utilize($router);
+
         return $commandBus;
     }
 ]);

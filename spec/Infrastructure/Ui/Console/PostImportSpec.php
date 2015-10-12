@@ -7,10 +7,10 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Domain\Service\IdGenerator;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+use Prooph\ServiceBus\CommandBus;
 use Prophecy\Argument;
 use PhpSpec\ObjectBehavior;
 use Gorka\Blog\Infrastructure\Ui\Console\PostImport;
-use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +27,7 @@ class PostImportSpec extends ObjectBehavior
      */
     private $workdir;
 
-    function let(MessageBus $commandBus, IdGenerator $idGenerator, QuestionHelper $questionHelper)
+    function let(CommandBus $commandBus, IdGenerator $idGenerator, QuestionHelper $questionHelper)
     {
         $this->workdir = vfsStream::setup('workdir');
         $idGenerator->id()->willReturn(self::TEST_ID);
@@ -42,7 +42,7 @@ class PostImportSpec extends ObjectBehavior
     function it_should_put_create_post_command_on_the_bus(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus,
+        CommandBus $commandBus,
         QuestionHelper $questionHelper
     ) {
         $questionHelper->ask($input, $output, Argument::any())->willReturn(self::TEST_TITLE);
@@ -56,7 +56,7 @@ class PostImportSpec extends ObjectBehavior
             self::TEST_CONTENT
         );
 
-        $commandBus->handle($message)->shouldBeCalled();
+        $commandBus->dispatch($message)->shouldBeCalled();
         $output->writeln(Argument::containingString('has been imported'))->shouldBeCalled();
         $this->execute($input, $output);
     }
@@ -64,11 +64,11 @@ class PostImportSpec extends ObjectBehavior
     function it_should_not_put_commands_on_bus_on_file_not_found(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus
+        CommandBus $commandBus
     ) {
         $input->getArgument('file')->willReturn('vfs://workdir/'.self::TEST_FILENAME);
 
-        $commandBus->handle(Argument::any())->shouldNotBeCalled();
+        $commandBus->dispatch(Argument::any())->shouldNotBeCalled();
         $output->writeln(Argument::containingString('Unable to import post'))->shouldBeCalled();
         $this->execute($input, $output);
     }
@@ -76,12 +76,12 @@ class PostImportSpec extends ObjectBehavior
     function it_should_not_put_commands_on_bus_on_file_unreaedable(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus
+        CommandBus $commandBus
     ) {
         $input->getArgument('file')->willReturn('vfs://workdir/'.self::TEST_FILENAME);
         $this->createFile(self::TEST_FILENAME, self::TEST_CONTENT, 0222);
 
-        $commandBus->handle(Argument::any())->shouldNotBeCalled();
+        $commandBus->dispatch(Argument::any())->shouldNotBeCalled();
         $output->writeln(Argument::containingString('Unable to import post'))->shouldBeCalled();
         $this->execute($input, $output);
     }

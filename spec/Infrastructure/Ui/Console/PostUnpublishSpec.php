@@ -6,8 +6,8 @@ use Gorka\Blog\Domain\Command\Post\UnpublishPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUnpublish;
 use PhpSpec\ObjectBehavior;
+use Prooph\ServiceBus\CommandBus;
 use Prophecy\Argument;
-use SimpleBus\Message\Bus\MessageBus;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -15,7 +15,7 @@ class PostUnpublishSpec extends ObjectBehavior
 {
     const TEST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';
 
-    function let(MessageBus $commandBus)
+    function let(CommandBus $commandBus)
     {
         $this->beConstructedWith($commandBus);
     }
@@ -28,11 +28,11 @@ class PostUnpublishSpec extends ObjectBehavior
     function it_should_put_unpublish_command_on_the_bus(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus
+        CommandBus $commandBus
     ) {
         $input->getArgument('id')->willReturn(self::TEST_ID);
         $message = new UnpublishPost(PostId::create(self::TEST_ID));
-        $commandBus->handle($message)->shouldBeCalled();
+        $commandBus->dispatch($message)->shouldBeCalled();
         $output->writeln(Argument::containingString('has been unpublished'))->shouldBeCalled();
         $this->execute($input, $output);
     }
@@ -40,10 +40,10 @@ class PostUnpublishSpec extends ObjectBehavior
     function it_should_not_put_unpublish_command_on_invalid_id(
         InputInterface $input,
         OutputInterface $output,
-        MessageBus $commandBus
+        CommandBus $commandBus
     ) {
         $input->getArgument('id')->willReturn(null);
-        $commandBus->handle(Argument::any())->shouldNotBeCalled();
+        $commandBus->dispatch(Argument::any())->shouldNotBeCalled();
         $output->writeln(Argument::containingString('Unable to unpublish post'))->shouldBeCalled();
         $this->execute($input, $output);
     }

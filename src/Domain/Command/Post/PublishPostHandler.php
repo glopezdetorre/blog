@@ -5,7 +5,7 @@ namespace Gorka\Blog\Domain\Command\Post;
 use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\Post;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\EventBus;
 
 class PublishPostHandler
 {
@@ -15,15 +15,15 @@ class PublishPostHandler
     private $eventStore;
 
     /**
-     * @var MessageBus
+     * @var EventBus
      */
     private $eventBus;
 
     /**
      * @param EventStore $eventStore
-     * @param MessageBus $eventBus
+     * @param EventBus $eventBus
      */
-    public function __construct(EventStore $eventStore, MessageBus $eventBus)
+    public function __construct(EventStore $eventStore, EventBus $eventBus)
     {
         $this->eventStore = $eventStore;
         $this->eventBus = $eventBus;
@@ -37,7 +37,7 @@ class PublishPostHandler
 
         $this->eventStore->commit(new AggregateHistory($post->id(), $post->recordedEvents()));
         foreach ($post->recordedEvents() as $event) {
-            $this->eventBus->handle($event);
+            $this->eventBus->dispatch($event);
         }
     }
 }

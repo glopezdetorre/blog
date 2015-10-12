@@ -11,20 +11,17 @@ use Gorka\Blog\Domain\Model\AggregateHistory;
 use Gorka\Blog\Domain\Model\EventStore;
 use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
+use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
-use SimpleBus\Message\Bus\MessageBus;
 
 class UnpublishPostHandlerSpec extends ObjectBehavior
 {
     const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';
-
     const POST_TITLE = 'My Title';
-
     const POST_SLUG = 'my-title';
-
     const POST_CONTENT = 'Content';
 
-    function let(EventStore $eventStore, MessageBus $eventBus)
+    function let(EventStore $eventStore, EventBus $eventBus)
     {
         $this->beConstructedWith($eventStore, $eventBus);
     }
@@ -34,7 +31,7 @@ class UnpublishPostHandlerSpec extends ObjectBehavior
         $this->shouldHaveType(UnpublishPostHandler::class);
     }
 
-    function it_should_commit_unpublish_post_events(EventStore $eventStore, MessageBus $eventBus, UnpublishPost $command)
+    function it_should_commit_unpublish_post_events(EventStore $eventStore, EventBus $eventBus, UnpublishPost $command)
     {
         $id = PostId::create(self::POST_ID);
         $command->postId()->willReturn($id);
@@ -57,7 +54,7 @@ class UnpublishPostHandlerSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         foreach ($expectedEvents as $expectedEvent) {
-            $eventBus->handle($expectedEvent)->shouldBeCalled();
+            $eventBus->dispatch($expectedEvent)->shouldBeCalled();
         }
 
         $this->handle($command);

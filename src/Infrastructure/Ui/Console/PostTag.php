@@ -4,9 +4,7 @@ namespace Gorka\Blog\Infrastructure\Ui\Console;
 
 use Gorka\Blog\Domain\Command\Post\TagPost;
 use Gorka\Blog\Domain\Model\Post\PostId;
-use Gorka\Blog\Domain\Model\Post\Tag;
-use Gorka\Blog\Domain\Service\Slugifier;
-use SimpleBus\Message\Bus\MessageBus;
+use Prooph\ServiceBus\CommandBus;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,14 +13,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PostTag extends Command
 {
     /**
-     * @var MessageBus Message bus
+     * @var CommandBus Message bus
      */
     private $commandBus;
 
     /**
-     * @param MessageBus $commandBus
+     * @param CommandBus $commandBus
      */
-    public function __construct(MessageBus $commandBus)
+    public function __construct(CommandBus $commandBus)
     {
         parent::__construct();
         $this->commandBus = $commandBus;
@@ -48,7 +46,7 @@ class PostTag extends Command
         try {
             $id = PostId::create($input->getArgument('id'));
             $tag = $input->getArgument('tag');
-            $this->commandBus->handle(new TagPost($id, $tag));
+            $this->commandBus->dispatch(new TagPost($id, $tag));
             $output->writeln(sprintf('<info>Post with id %s has been tagged with \'%s\'</info>', $id, $tag));
         } catch (\Exception $e) {
             $output->writeln('<error>Unable to tag post:</error> '.$e->getMessage());
