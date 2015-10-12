@@ -1,0 +1,7 @@
+---
+- name: install php
+  apt: name=php5 state=present
+  apt: name=php5-intl state=present
+  apt: name=php5-mcrypt state=present
+  apt: name=php5-mysql state=present
+  apt: name=php5-mongo state=present

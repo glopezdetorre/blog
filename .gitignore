@@ -10,3 +10,6 @@ build
 
 # Composer
 vendor/
+
+# Vagrant
+.vagrant
