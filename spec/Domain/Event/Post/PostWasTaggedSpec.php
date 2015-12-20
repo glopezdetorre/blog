@@ -8,6 +8,7 @@ use Gorka\Blog\Domain\Model\Post\Tag;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin PostWasTagged */
 class PostWasTaggedSpec extends ObjectBehavior
 {
     function let(PostId $postId, Tag $tag)

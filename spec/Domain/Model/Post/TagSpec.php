@@ -6,6 +6,7 @@ use Gorka\Blog\Domain\Model\Post\Tag;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin Tag */
 class TagSpec extends ObjectBehavior
 {
     const TEST_NAME = 'My Tag';

@@ -7,6 +7,7 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin PostWasCreated */
 class PostWasCreatedSpec extends ObjectBehavior
 {
     const TEST_CONTENT = 'My content';

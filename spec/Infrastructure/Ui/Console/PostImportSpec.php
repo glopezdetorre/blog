@@ -15,6 +15,7 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/** @mixin PostImport */
 class PostImportSpec extends ObjectBehavior
 {
     const TEST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';

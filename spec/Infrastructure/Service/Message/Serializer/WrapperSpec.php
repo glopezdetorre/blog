@@ -10,6 +10,7 @@ use Gorka\Blog\Infrastructure\Service\SystemClock;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin Wrapper */
 class WrapperSpec extends ObjectBehavior
 {
     function let(SystemClock $systemClock)

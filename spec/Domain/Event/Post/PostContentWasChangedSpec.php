@@ -7,6 +7,7 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin PostContentWasChanged */
 class PostContentWasChangedSpec extends ObjectBehavior
 {
     const POST_CONTENT = 'New content';

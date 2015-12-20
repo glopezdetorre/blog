@@ -13,6 +13,7 @@ use PhpSpec\ObjectBehavior;
 use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
 
+/** @mixin PublishPostHandler */
 class PublishPostHandlerSpec extends ObjectBehavior
 {
     const POST_ID = 'a54a1776-d347-4e75-8e8a-b6ebf034b912';

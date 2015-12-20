@@ -7,6 +7,7 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin PostTitleWasChanged */
 class PostTitleWasChangedSpec extends ObjectBehavior
 {
     const POST_TITLE = 'New title';

@@ -7,6 +7,7 @@ use Gorka\Blog\Infrastructure\Service\Slugifier;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin Slugifier */
 class SlugifierSpec extends ObjectBehavior
 {
     const TEST_STRING = 'test: this is a strängêr\'s string';

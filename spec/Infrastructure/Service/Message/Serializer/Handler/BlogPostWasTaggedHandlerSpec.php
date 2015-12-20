@@ -9,6 +9,7 @@ use Gorka\Blog\Domain\Model\Post\Tag;
 use Gorka\Blog\Infrastructure\Service\Message\Serializer\Handler\BlogPostWasTaggedHandler;
 use PhpSpec\ObjectBehavior;
 
+/** @mixin BlogPostWasTaggedHandler */
 class BlogPostWasTaggedHandlerSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';

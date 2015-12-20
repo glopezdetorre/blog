@@ -9,6 +9,7 @@ use Gorka\Blog\Infrastructure\Service\Message\Serializer\Handler\BlogPublishPost
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin BlogPublishPostHandler */
 class BlogPublishPostHandlerSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';

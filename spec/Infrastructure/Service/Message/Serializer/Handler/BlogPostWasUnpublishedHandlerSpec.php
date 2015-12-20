@@ -9,6 +9,7 @@ use Gorka\Blog\Infrastructure\Service\Message\Serializer\Handler\BlogPostWasUnpu
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin BlogPostWasUnpublishedHandler */
 class BlogPostWasUnpublishedHandlerSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';

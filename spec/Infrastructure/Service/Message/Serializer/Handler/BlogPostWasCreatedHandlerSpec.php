@@ -9,6 +9,7 @@ use Gorka\Blog\Infrastructure\Service\Message\Serializer\Handler\BlogPostWasCrea
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin BlogPostWasCreatedHandler */
 class BlogPostWasCreatedHandlerSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';

@@ -13,6 +13,7 @@ use PhpSpec\ObjectBehavior;
 use Prooph\ServiceBus\EventBus;
 use Prophecy\Argument;
 
+/** @mixin CreatePostHandler */
 class CreatePostHandlerSpec extends ObjectBehavior
 {
     const POST_TITLE = 'My Title';

@@ -7,6 +7,7 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin PostId */
 class PostIdSpec extends ObjectBehavior
 {
     const TEST_UUID = '56c57e60-32e3-4e6a-93cf-87143daef5b8';

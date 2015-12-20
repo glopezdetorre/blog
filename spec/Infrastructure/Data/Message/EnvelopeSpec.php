@@ -7,6 +7,7 @@ use Gorka\Blog\Infrastructure\Data\Message\Envelope;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin Envelope */
 class EnvelopeSpec extends ObjectBehavior
 {
     function let(DomainMessage $message, \DateTimeImmutable $creationTime)

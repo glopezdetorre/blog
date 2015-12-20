@@ -41,6 +41,7 @@ class Serializer
     /**
      * @param $data
      * @return DomainMessage
+     * @throws \InvalidArgumentException
      */
     public function deserialize($data)
     {

@@ -8,6 +8,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Rhumsaa\Uuid\Uuid;
 
+/** @mixin UuidGenerator */
 class UuidGeneratorSpec extends ObjectBehavior
 {
     function it_is_initializable()

@@ -10,6 +10,7 @@ use Gorka\Blog\Infrastructure\Service\Message\Serializer\Wrapper;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin Serializer */
 class SerializerSpec extends ObjectBehavior
 {
     function let(Wrapper $wrapper)

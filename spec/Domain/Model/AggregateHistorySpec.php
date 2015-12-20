@@ -8,6 +8,7 @@ use Gorka\Blog\Domain\Model\AggregateId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin AggregateHistory */
 class AggregateHistorySpec extends ObjectBehavior
 {
     function let(AggregateId $id, DomainEvent $domainEvent, DomainEvent $domainEvent2) {

@@ -8,6 +8,7 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use Gorka\Blog\Infrastructure\Service\Message\Serializer\Handler\BlogPostWasUntaggedHandler;
 use PhpSpec\ObjectBehavior;
 
+/** @mixin BlogPostWasUntaggedHandler */
 class BlogPostWasUntaggedHandlerSpec extends ObjectBehavior
 {
     const POST_ID = '25769c6c-d34d-4bfe-ba98-e0ee856f3e7a';

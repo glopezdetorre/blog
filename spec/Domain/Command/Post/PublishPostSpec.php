@@ -7,6 +7,7 @@ use Gorka\Blog\Domain\Model\Post\PostId;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/** @mixin PublishPost */
 class PublishPostSpec extends ObjectBehavior
 {
     function let(PostId $postId)

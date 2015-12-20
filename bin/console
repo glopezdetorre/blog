@@ -7,6 +7,9 @@ use Gorka\Blog\Domain\Command\Post\TagPost;
 use Gorka\Blog\Domain\Command\Post\TagPostHandler;
 use Gorka\Blog\Domain\Command\Post\UntagPost;
 use Gorka\Blog\Domain\Command\Post\UntagPostHandler;
+use Gorka\Blog\Domain\Query\Post\LatestPosts;
+use Gorka\Blog\Infrastructure\Data\EventStore\PostgresEventStore;
+use Gorka\Blog\Infrastructure\Ui\Console\PostQueryLatest;
 use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
 use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
@@ -44,11 +47,33 @@ $container = new Container([
         return new \Gorka\Blog\Infrastructure\Service\Message\Serializer\Serializer($c->get('Wrapper'));
     },
     'EventStore' => function ($c) {
-        $mongoClient = new MongoClient();
-        return new MongoEventStore($c->get('Serializer'), $mongoClient, 'blog', 'events');
+        $connection = new \PDO('pgsql:host=localhost;dbname=blog;');
+        return new PostgresEventStore($c->get('Serializer'), $connection);
+    },
+    'QueryBus' => function ($c) {
+        $queryBus = new \Prooph\ServiceBus\QueryBus();
+        $router = new \Prooph\ServiceBus\Plugin\Router\QueryRouter();
+        $router
+            ->route(LatestPosts::class)
+            ->to(
+                function () {
+                    $posts = [
+                        [
+                            'title' => 'Test title',
+                            'url' => 'http://blog.gorka.io/posts/test-title'
+                        ],
+                        [
+                            'title' => 'Test title the second',
+                            'url' => 'http://blog.gorka.io/posts/test-title-second'
+                        ],
+                    ];
+                    return $posts;
+                }
+            );
+        $queryBus->utilize($router);
+        return $queryBus;
     },
     'EventBus' => function ($c) {
-
         $eventBus = new \Prooph\ServiceBus\EventBus();
         $router = new \Prooph\ServiceBus\Plugin\Router\EventRouter();
         $router
@@ -63,7 +88,6 @@ $container = new Container([
         return $eventBus;
     },
     'CommandBus' => function ($c) {
-
         $commandBus = new \Prooph\ServiceBus\CommandBus();
         $router = new \Prooph\ServiceBus\Plugin\Router\CommandRouter();
         $router
@@ -154,4 +178,6 @@ $application->add(new PostPublish($container->get('CommandBus')));
 $application->add(new PostUnpublish($container->get('CommandBus')));
 $application->add(new PostTag($container->get('CommandBus')));
 $application->add(new PostUntag($container->get('CommandBus')));
+$application->add(new PostQueryLatest($container->get('QueryBus')));
+
 $application->run();

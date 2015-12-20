@@ -1,0 +1,25 @@
+redis:
+  image: redis
+
+db:
+  image: postgres
+
+nginx:
+  build: .
+  ports:
+    - "80:80"
+    - "443:443"
+  volumes:
+    - ./:/var/www/blog/
+  links:
+    - phpfpm
+
+phpfpm:
+  image: php:fpm
+  ports:
+    - "9000:9000"
+  volumes:
+    - ./:/var/www/blog/
+  links:
+    - redis
+    - db
