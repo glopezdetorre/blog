@@ -1,3 +1,6 @@
+rabbit:
+  image: rabbitmq
+
 redis:
   image: redis
 
@@ -22,4 +25,5 @@ phpfpm:
     - ./:/var/www/blog/
   links:
     - redis
+    - rabbit
     - db

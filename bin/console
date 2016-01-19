@@ -12,7 +12,6 @@ use Gorka\Blog\Infrastructure\Data\EventStore\PostgresEventStore;
 use Gorka\Blog\Infrastructure\Ui\Console\PostQueryLatest;
 use Gorka\Blog\Infrastructure\Ui\Console\PostTag;
 use Gorka\Blog\Infrastructure\Ui\Console\PostUntag;
-use Gorka\Blog\Infrastructure\Data\EventStore\MongoEventStore;
 use Gorka\Blog\Infrastructure\Service\UuidGenerator;
 use Gorka\Blog\Domain\Command\Post\PublishPostHandler;
 use Gorka\Blog\Domain\Command\Post\UnpublishPostHandler;
